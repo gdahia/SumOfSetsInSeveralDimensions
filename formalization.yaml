@@ -1,0 +1,150 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/formalization.schema.json
+version: "v0.4"
+
+project:
+  name: "Sum of sets in several dimensions"
+  description: >-
+    Lean 4 formalization of Ruzsa's lower bound for sumsets in ℝ^D: if A and B are finite
+    sets with B nonempty and |B| ≤ |A|, and A + B has affine dimension d, then
+    |A + B| ≥ |A| + Σ_{t=1}^{|B|-1} min(d, |A| - t). The closed form
+    |A + B| ≥ |A| + d|B| - d(d+1)/2, the asymmetric form of Freiman's lemma, is derived from
+    it. The proof of the lower bound is the one of the DenseSetsWithoutLargeSumsets project.
+  authors:
+    - name: "Gabriel Dahia"
+      github: "gdahia"
+  license: "Apache-2.0"
+  responsible_maintainers:
+    - name: "Gabriel Dahia"
+      github: "gdahia"
+
+classification:
+  arxiv: ["math.CO", "math.NT"]
+  msc2020: ["11P70", "11B13", "11B75"]
+
+sources:
+  - title: "Sum of sets in several dimensions"
+    authors:
+      - "Imre Z. Ruzsa"
+    id: "https://doi.org/10.1007/BF01302969"
+    type: "article"
+    location: "https://doi.org/10.1007/BF01302969"
+    relationship: "formalizes"
+    note: >-
+      Combinatorica 14 (1994), no. 4, 485–490. The lower bound with the sum of minima and its
+      closed form. Mudgal cites the closed form as Corollary 1.1 of the paper
+      (arXiv:1902.07665, arXiv:2007.11526). The text of the paper was not available when this
+      repository was assembled, so the number of the theorem with the sum of minima is not
+      given. See fidelity.divergences.
+    license: "unknown"
+    author_endorsement: "not-contacted"
+
+related_formalizations:
+  - id: "https://github.com/gdahia/DenseSetsWithoutLargeSumsets"
+    relationship: "adapts"
+    note: >-
+      Source of the proof of the lower bound. The module
+      Combinatorics.Additive.SumOfSetsInSeveralDimensions is copied from commit 5f4b915,
+      with the definition finsetAffineDim and four lemmas about it from FreimanDimension
+      and FreimanDimensionSumsetBounds. The proof is split into four modules, ported from
+      Lean v4.34.0-rc1 to v4.35.0-rc4 and placed in the namespace
+      SumOfSetsInSeveralDimensions, and the theorem card_add_lower_bound_of_affineDim is
+      renamed card_add_sum_min_le_card_add. The Freiman dimension, the rational Freiman
+      models and the bound for subsets of ZMod q of that project are not copied.
+
+status:
+  scope: >-
+    The lower bound with the sum of minima and its closed form, for finite subsets of
+    Fin D → ℝ, and lemmas on the affine dimension of a finite set: its expression as the
+    rank of the vector span, monotonicity, invariance under translation, and bounds for the
+    dimension of a sumset by those of the summands and of the union. No statement that the
+    bound is attained is formalized, and no other result of the paper. The sorry counts
+    refer to the library and Solution.lean; Challenge.lean has one placeholder for each of
+    its two statements.
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms: ["propext", "Classical.choice", "Quot.sound"]
+
+automation:
+  methods:
+    - method: "agent"
+      models: ["Claude Opus 5.5"]
+      framework: "Claude Code"
+      tool_setup: "Lean 4, Mathlib, shell, a clone of DenseSetsWithoutLargeSumsets."
+      cost:
+        wall_time: "one session"
+        spend_usd: "not tracked"
+        hardware: "local machine"
+      prompting_notes: >-
+        One instruction to move Ruzsa's theorem from DenseSetsWithoutLargeSumsets to a
+        repository of its own, with the closed form and the lemmas that relate the affine
+        dimension to the vector span.
+    - method: "agent"
+      models: ["gpt-5.6 sol high", "claude opus 5"]
+      framework: "Codex"
+      tool_setup: >-
+        The entry of DenseSetsWithoutLargeSumsets, which covers the copied proof: Codex
+        agents guided by the AGENTS.md of that repository, with Lean proofs checked in its
+        pinned Lake environment.
+  spend_usd: "not tracked"
+  notes: >-
+    The proof of the lower bound was written by AI agents in DenseSetsWithoutLargeSumsets.
+    Claude Code, directed by Gabriel Dahia, assembled this repository: it copied that proof,
+    split it into modules and ported it, and wrote the lemmas on translations and on the
+    dimension of the summands, the closed form, Challenge.lean, Solution.lean and this file.
+    Every proof is checked by Lean. The solution theorems use propext, Classical.choice and
+    Quot.sound only.
+
+fidelity:
+  divergences: >-
+    The ambient space is Fin D → ℝ for an arbitrary D, and d is the affine dimension of
+    A + B, the dimension of the direction of its affine span. This direction is the span of
+    the differences of the elements of A + B, and Challenge.lean writes d as the rank of that
+    span, with the pointwise difference of sets. Thus d ≤ D, and d < D is allowed. The set B is assumed nonempty; DenseSetsWithoutLargeSumsets records
+    that this is the assumption of positive cardinality of the paper, and records no other
+    divergence for this theorem.
+
+    The closed form is stated in ℕ as |A| + d|B| ≤ |A + B| + d(d+1)/2, for every d at most
+    the affine dimension of A + B. The library also has it multiplied by two, in ℝ, and
+    with the maximum and the minimum of |A| and |B| when neither set is assumed to be the
+    larger. It is derived from the lower bound with the sum of minima by an induction on
+    |B|.
+
+    The Lean proof of the lower bound is by induction on |A| + |B|: both sets are translated
+    so that their lexicographically least elements are 0, and 0 is removed from one or both
+    of them. It was not compared with the proof in the paper.
+
+review:
+  status: "unchecked"
+  reviewers: []
+  notes: >-
+    No mathematical or formalization review of this repository.
+    DenseSetsWithoutLargeSumsets records its own status as self-assessed. lake comparator,
+    run on macOS on 10 October 2026 with its sandbox disabled, accepts the solution with
+    Lean's kernel, nanoda and con-ron. scripts/verify-comparator.sh, which runs it in the
+    sandbox and needs Linux, has not been run.
+
+alignment:
+  namespace: "SumOfSetsInSeveralDimensions"
+  statements:
+    - source: "The lower bound with the sum of minima"
+      lean: "SumOfSetsInSeveralDimensions.card_add_sum_min_le_card_add_of_finrank_span_sub_eq"
+      module: "Challenge"
+      status: "proved"
+      note: "With d the rank of the span of the differences of A + B."
+    - source: "The closed form, cited by Mudgal as Corollary 1.1"
+      lean: "SumOfSetsInSeveralDimensions.card_add_mul_card_le_card_add_add_of_le_finrank_span_sub"
+      module: "Challenge"
+      status: "proved"
+      note: "For every d at most the rank of the span of the differences of A + B."
+    - source: "The lower bound with the sum of minima, library form"
+      lean: "SumOfSetsInSeveralDimensions.card_add_sum_min_le_card_add"
+      module: "SumOfSetsInSeveralDimensions.LowerBound"
+      status: "proved"
+      note: "With d = finsetAffineDim (A + B)."
+    - source: "The closed form, library form"
+      lean: "SumOfSetsInSeveralDimensions.card_add_mul_card_le_card_add_add"
+      module: "SumOfSetsInSeveralDimensions.ClosedForm"
+      status: "proved"
+      note: "With d ≤ finsetAffineDim (A + B)."
+
+acknowledgements: "Lean 4 and Mathlib; the Palomar registry template."
