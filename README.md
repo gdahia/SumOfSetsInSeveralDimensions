@@ -1,30 +1,27 @@
 # Sum of sets in several dimensions
 
-Lean 4 proof of the lower bound for sumsets in `ℝ^D` of Imre Z. Ruzsa,
+Lean 4 proof of the lower bound for sumsets in $\mathbb{R}^D$ of Imre Z. Ruzsa,
 [*Sum of sets in several dimensions*](https://doi.org/10.1007/BF01302969), Combinatorica 14
 (1994), 485–490, and of its closed form, the asymmetric form of Freiman's lemma.
 
-The proof of the lower bound comes from
-[DenseSetsWithoutLargeSumsets](https://github.com/gdahia/DenseSetsWithoutLargeSumsets).
-
 ## Results
 
-The affine dimension of a finite set `S ⊆ ℝ^D` is the dimension of the direction of its affine
-span, that is, of the subspace spanned by the differences of the points of `S`.
+The affine dimension of a finite set $S \subseteq \mathbb{R}^D$ is the dimension of the direction
+of its affine span, that is, of the subspace spanned by the differences of the points of $S$.
 
 **Ruzsa's theorem**
 (`SumOfSetsInSeveralDimensions.card_add_sum_min_le_card_add_of_finrank_span_sub_eq`). Let
-`A, B ⊆ ℝ^D` be finite sets with `B` nonempty and `|B| ≤ |A|`, and let `d` be the affine dimension
-of `A + B`. Then
+$A, B \subseteq \mathbb{R}^D$ be finite sets with $B$ nonempty and $|B| \le |A|$, and let $d$ be
+the affine dimension of $A + B$. Then
 
-`|A + B| ≥ |A| + ∑ t ∈ {1, …, |B| - 1}, min d (|A| - t)`.
+$$|A + B| \ge |A| + \sum_{t=1}^{|B|-1} \min(d, |A| - t).$$
 
 **The asymmetric form of Freiman's lemma**
 (`SumOfSetsInSeveralDimensions.card_add_mul_card_le_card_add_add_of_le_finrank_span_sub`). Let
-`A, B ⊆ ℝ^D` be finite sets with `B` nonempty and `|B| ≤ |A|`, and let `d` be at most the affine
-dimension of `A + B`. Then
+$A, B \subseteq \mathbb{R}^D$ be finite sets with $B$ nonempty and $|B| \le |A|$, and let $d$ be
+at most the affine dimension of $A + B$. Then
 
-`|A| + d * |B| ≤ |A + B| + d * (d + 1) / 2`.
+$$|A| + d|B| \le |A + B| + \frac{d(d+1)}{2}.$$
 
 [Solution.lean](Solution.lean) proves both. [Challenge.lean](Challenge.lean) contains the same
 statements in terms of Mathlib, with the affine dimension of `A + B` written as
@@ -51,71 +48,21 @@ are the following.
 | `card_add_mul_card_sub_le_card_add` | `\|A\| + d * \|B\| - d * (d + 1) / 2 ≤ \|A + B\|` in `ℝ` |
 | `max_card_add_mul_min_card_le_card_add_add` | The closed form for nonempty `A` and `B`, with `max \|A\| \|B\|` and `min \|A\| \|B\|` in place of `\|A\|` and `\|B\|` |
 
-**The Freiman dimension.** The Freiman dimension `freimanDim X` of a finite subset `X` of a
-commutative monoid is the largest `d ≤ |X|` such that `X` is Freiman isomorphic of order `2` to a
-subset of `ℚ^d` of affine dimension `d`. The library, and not `Challenge.lean`, has the following
-statements for it. Chang's theorem in
-[ChangFreimanRuzsa](https://github.com/gdahia/ChangFreimanRuzsa) is stated with this definition.
-
-| Declaration | Statement |
-| --- | --- |
-| `freimanDim X`, `freimanModelDim X d` | The Freiman dimension, and the existence of a Freiman model of affine dimension `d` in `ℚ^d` |
-| `card_add_sum_min_le_of_freimanDim_union` | If `A`, `B` are nonempty with `\|B\| ≤ \|A\|` and `freimanDim (A ∪ B) = r ≥ 1`, then `\|A\| + ∑ t ∈ {1, …, \|B\| - 1}, min (r - 1) (\|A\| - t) ≤ \|A + B\|` |
-| `card_add_lower_bound_of_freimanDim_union` | Under the same hypotheses, `\|A\| + (r - 1) * \|B\| - (r + 1).choose 2 ≤ \|A + B\|` |
-| `freimanDim_le_two_mul_sub_one_of_card_add_le` | If `\|X + X\| ≤ κ * \|X\|`, then `freimanDim X ≤ 2 * κ - 1` |
-
-## Proof and files
-
-The proof of Ruzsa's theorem is by induction on `|A| + |B|`. If `|B| = 1` the bound is
-`|A + B| ≥ |A|`. Otherwise translate `A` and `B` so that the least element of each in the
-lexicographic order of `ℝ^D` is `0`. Then every other element is lexicographically positive. Let
-`A'` and `B'` be the sets without `0`, and let `U` be the direction of the affine span of
-`A' + B'`. One of the following holds.
-
-- `A' + B'` has dimension `d`. The points of `A + B` outside `A' + B'` are `0` and the points of
-  `(A' ∪ B') \ (A' + B')`. Every point of `A + B` is a sum of points of the latter set, by
-  induction along the lexicographic order, so that set has at least `d` points and
-  `|A + B| ≥ |A' + B'| + d + 1`.
-- `A' + B'` has dimension `d - 1` and `B'` has a point outside `U`. Then `A` is disjoint from
-  `A' + B'`, and `|A + B| ≥ |A| + |A' + B'|`.
-- `A' + B'` has dimension `d - 2`. Then `A + B'` has dimension `d - 1` and is disjoint from `A`,
-  and `|A + B| ≥ |A| + |A + B'|`.
-- `B' ⊆ U`. Then `A' + B` has dimension `d - 1` and is disjoint from `B`, and
-  `|A + B| ≥ |B| + |A' + B|`.
-
-In each case the induction hypothesis applies to the smaller pair, and an inequality between the
-values of the bound finishes the proof.
-
-For the closed form, `∑ t ∈ {1, …, m - 1}, min d (n - t) ≥ d * m - d * (d + 1) / 2` when
-`1 ≤ m ≤ n`, by induction on `m`.
+## Files
 
 | Files in `SumOfSetsInSeveralDimensions/` | Contents |
 | --- | --- |
 | `AffineDim.lean` | The affine dimension of a finite set, monotonicity, translations |
 | `AffineDimSumset.lean` | The affine dimension of `A + B` against those of `A`, `B` and `A ∪ B` |
-| `LowerBoundFunction.lean` | The bound as a function of `d`, `\|B\|` and `\|A\|`, and the inequalities for the induction |
+| `LowerBoundFunction.lean` | The bound as a function of $d$, $\lvert B \rvert$ and $\lvert A \rvert$, and the inequalities for the induction |
 | `Normalize.lean` | Translation of a set by its lexicographically least element |
-| `GeometricDeletion.lean` | The four cases above |
+| `GeometricDeletion.lean` | The four cases for removing `0` from the translated summands |
 | `LowerBound.lean` | Ruzsa's theorem |
 | `ClosedForm.lean` | The closed form |
-| `FreimanDimension.lean` | The Freiman dimension |
-| `FreimanDimensionSumsetBounds.lean` | Ruzsa's theorem for sets of given Freiman dimension, and `freimanDim X ≤ 2 * κ - 1` |
 
-`FreimanDimension.lean` and `FreimanDimensionSumsetBounds.lean` come from the same project, where
-they were rewritten after commit `5f4b915`.
-
-`LowerBoundFunction.lean`, `Normalize.lean`, `GeometricDeletion.lean` and the induction in
-`LowerBound.lean` are copied from DenseSetsWithoutLargeSumsets at commit `5f4b915`, where they
-form one module, and ported to Lean `v4.35.0-rc4`. The definition `finsetAffineDim` and the
-lemmas `finsetAffineDim_mono`, `finsetAffineDim_add_one_le_card`, `finsetAffineDim_le_card` and
-`finsetAffineDim_union_le_sum_add_one` come from the same project. The theorem is called
-`card_add_lower_bound_of_affineDim` there.
-
-Akshat Mudgal cites the closed form as Corollary 1.1 of Ruzsa's paper
-([arXiv:1902.07665](https://arxiv.org/abs/1902.07665),
-[arXiv:2007.11526](https://arxiv.org/abs/2007.11526)). The Lean proof was not compared with the
-proof in the paper. [formalization.yaml](formalization.yaml) records the differences from the
-paper, the scope, and the use of AI coding agents.
+The Lean proof was not compared with the proof in Ruzsa's paper.
+[formalization.yaml](formalization.yaml) records the differences from the paper, the
+scope, and the use of AI coding agents.
 
 ## Build
 

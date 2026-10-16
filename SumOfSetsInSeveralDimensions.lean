@@ -8,8 +8,6 @@ module
 public import SumOfSetsInSeveralDimensions.AffineDim
 public import SumOfSetsInSeveralDimensions.AffineDimSumset
 public import SumOfSetsInSeveralDimensions.ClosedForm
-public import SumOfSetsInSeveralDimensions.FreimanDimension
-public import SumOfSetsInSeveralDimensions.FreimanDimensionSumsetBounds
 public import SumOfSetsInSeveralDimensions.GeometricDeletion
 public import SumOfSetsInSeveralDimensions.LowerBound
 public import SumOfSetsInSeveralDimensions.LowerBoundFunction

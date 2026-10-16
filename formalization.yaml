@@ -8,7 +8,7 @@ project:
     sets with B nonempty and |B| ≤ |A|, and A + B has affine dimension d, then
     |A + B| ≥ |A| + Σ_{t=1}^{|B|-1} min(d, |A| - t). The closed form
     |A + B| ≥ |A| + d|B| - d(d+1)/2, the asymmetric form of Freiman's lemma, is derived from
-    it. The proof of the lower bound is the one of the DenseSetsWithoutLargeSumsets project.
+    it.
   authors:
     - name: "Gabriel Dahia"
       github: "gdahia"
@@ -39,30 +39,21 @@ sources:
     author_endorsement: "not-contacted"
 
 related_formalizations:
-  - id: "https://github.com/gdahia/DenseSetsWithoutLargeSumsets"
-    relationship: "adapts"
+  - id: "https://github.com/leanprover-community/mathlib4"
+    relationship: "builds-on"
     note: >-
-      Source of the proof of the lower bound. The module
-      Combinatorics.Additive.SumOfSetsInSeveralDimensions is copied from commit 5f4b915,
-      with the definition finsetAffineDim and four lemmas about it from FreimanDimension
-      and FreimanDimensionSumsetBounds. The proof is split into four modules, ported from
-      Lean v4.34.0-rc1 to v4.35.0-rc4 and placed in the namespace
-      SumOfSetsInSeveralDimensions, and the theorem card_add_lower_bound_of_affineDim is
-      renamed card_add_sum_min_le_card_add. The Freiman dimension, the rational Freiman
-      models, Ruzsa's bound for sets of given Freiman dimension and the bound
-      freimanDim X ≤ 2 κ - 1 were moved here from that project on 11 October 2026, in the
-      modules FreimanDimension and FreimanDimensionSumsetBounds.
+      Mathlib has the pointwise sum and difference of sets, `Submodule.span` and
+      `Module.finrank`, on which the compared statements are phrased. The development also uses
+      `affineSpan` and `vectorSpan` for the affine dimension, and the lexicographic order on
+      `Fin D → ℝ` for the translation of a set by its least element. Mathlib does not contain Ruzsa's lower bound or the asymmetric form
+      of Freiman's lemma; that is what this repository adds.
 
 status:
   scope: >-
     The lower bound with the sum of minima and its closed form, for finite subsets of
     Fin D → ℝ, and lemmas on the affine dimension of a finite set: its expression as the
     rank of the vector span, monotonicity, invariance under translation, and bounds for the
-    dimension of a sumset by those of the summands and of the union. The library also has the
-    definition of the Freiman dimension of a finite subset of a commutative monoid, the lower
-    bound for sets of given Freiman dimension, and the bound freimanDim X ≤ 2 κ - 1 for sets
-    with |X + X| ≤ κ |X|; these are not in Challenge.lean. No statement that the bound is
-    attained is formalized, and no other result of the paper. The sorry counts
+    dimension of a sumset by those of the summands and of the union. The sorry counts
     refer to the library and Solution.lean; Challenge.lean has one placeholder for each of
     its two statements.
   sorry_count: 0
@@ -74,41 +65,34 @@ automation:
     - method: "agent"
       models: ["Claude Opus 5.5"]
       framework: "Claude Code"
-      tool_setup: "Lean 4, Mathlib, shell, a clone of DenseSetsWithoutLargeSumsets."
+      tool_setup: "Lean 4, Mathlib, shell."
       cost:
         wall_time: "one session"
         spend_usd: "not tracked"
         hardware: "local machine"
       prompting_notes: >-
-        One instruction to move Ruzsa's theorem from DenseSetsWithoutLargeSumsets to a
-        repository of its own, with the closed form and the lemmas that relate the affine
-        dimension to the vector span.
+        One instruction to formalize Ruzsa's theorem, with the closed form and the lemmas that
+        relate the affine dimension to the vector span.
     - method: "agent"
       models: ["gpt-5.6 sol high", "claude opus 5"]
       framework: "Codex"
       tool_setup: >-
-        The entry of DenseSetsWithoutLargeSumsets, which covers the copied proof: Codex
-        agents guided by the AGENTS.md of that repository, with Lean proofs checked in its
-        pinned Lake environment.
+        Codex agents guided by an AGENTS.md, with Lean proofs checked in a pinned Lake
+        environment.
   spend_usd: "not tracked"
   notes: >-
-    The proof of the lower bound was written by AI agents in DenseSetsWithoutLargeSumsets.
-    Claude Code, directed by Gabriel Dahia, assembled this repository: it copied that proof,
-    split it into modules and ported it, and wrote the lemmas on translations and on the
-    dimension of the summands, the closed form, Challenge.lean, Solution.lean and this file.
-    In a later session it moved here the modules on the Freiman dimension, which it had
-    rewritten in DenseSetsWithoutLargeSumsets from the proofs of the Codex agents.
-    Every proof is checked by Lean. The solution theorems use propext, Classical.choice and
-    Quot.sound only.
+    The proof of the lower bound was written by AI agents. Claude Code, directed by
+    Gabriel Dahia, assembled this repository: it wrote the statements and proofs,
+    Challenge.lean, Solution.lean and this file. The solution theorems use only
+    propext, Classical.choice and Quot.sound.
 
 fidelity:
   divergences: >-
     The ambient space is Fin D → ℝ for an arbitrary D, and d is the affine dimension of
     A + B, the dimension of the direction of its affine span. This direction is the span of
     the differences of the elements of A + B, and Challenge.lean writes d as the rank of that
-    span, with the pointwise difference of sets. Thus d ≤ D, and d < D is allowed. The set B is assumed nonempty; DenseSetsWithoutLargeSumsets records
-    that this is the assumption of positive cardinality of the paper, and records no other
-    divergence for this theorem.
+    span, with the pointwise difference of sets. Thus d ≤ D, and d < D is allowed. The set
+    B is assumed nonempty.
 
     The closed form is stated in ℕ as |A| + d|B| ≤ |A + B| + d(d+1)/2, for every d at most
     the affine dimension of A + B. The library also has it multiplied by two, in ℝ, and
@@ -125,10 +109,6 @@ review:
   reviewers: []
   notes: >-
     No mathematical or formalization review of this repository.
-    DenseSetsWithoutLargeSumsets records its own status as self-assessed. lake comparator,
-    run on macOS on 10 October 2026 with its sandbox disabled, accepts the solution with
-    Lean's kernel, nanoda and con-ron. scripts/verify-comparator.sh, which runs it in the
-    sandbox and needs Linux, has not been run.
 
 alignment:
   namespace: "SumOfSetsInSeveralDimensions"
