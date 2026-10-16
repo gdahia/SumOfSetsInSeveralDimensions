@@ -51,6 +51,19 @@ are the following.
 | `card_add_mul_card_sub_le_card_add` | `\|A\| + d * \|B\| - d * (d + 1) / 2 ≤ \|A + B\|` in `ℝ` |
 | `max_card_add_mul_min_card_le_card_add_add` | The closed form for nonempty `A` and `B`, with `max \|A\| \|B\|` and `min \|A\| \|B\|` in place of `\|A\|` and `\|B\|` |
 
+**The Freiman dimension.** The Freiman dimension `freimanDim X` of a finite subset `X` of a
+commutative monoid is the largest `d ≤ |X|` such that `X` is Freiman isomorphic of order `2` to a
+subset of `ℚ^d` of affine dimension `d`. The library, and not `Challenge.lean`, has the following
+statements for it. Chang's theorem in
+[ChangFreimanRuzsa](https://github.com/gdahia/ChangFreimanRuzsa) is stated with this definition.
+
+| Declaration | Statement |
+| --- | --- |
+| `freimanDim X`, `freimanModelDim X d` | The Freiman dimension, and the existence of a Freiman model of affine dimension `d` in `ℚ^d` |
+| `card_add_sum_min_le_of_freimanDim_union` | If `A`, `B` are nonempty with `\|B\| ≤ \|A\|` and `freimanDim (A ∪ B) = r ≥ 1`, then `\|A\| + ∑ t ∈ {1, …, \|B\| - 1}, min (r - 1) (\|A\| - t) ≤ \|A + B\|` |
+| `card_add_lower_bound_of_freimanDim_union` | Under the same hypotheses, `\|A\| + (r - 1) * \|B\| - (r + 1).choose 2 ≤ \|A + B\|` |
+| `freimanDim_le_two_mul_sub_one_of_card_add_le` | If `\|X + X\| ≤ κ * \|X\|`, then `freimanDim X ≤ 2 * κ - 1` |
+
 ## Proof and files
 
 The proof of Ruzsa's theorem is by induction on `|A| + |B|`. If `|B| = 1` the bound is
@@ -85,6 +98,11 @@ For the closed form, `∑ t ∈ {1, …, m - 1}, min d (n - t) ≥ d * m - d * (
 | `GeometricDeletion.lean` | The four cases above |
 | `LowerBound.lean` | Ruzsa's theorem |
 | `ClosedForm.lean` | The closed form |
+| `FreimanDimension.lean` | The Freiman dimension |
+| `FreimanDimensionSumsetBounds.lean` | Ruzsa's theorem for sets of given Freiman dimension, and `freimanDim X ≤ 2 * κ - 1` |
+
+`FreimanDimension.lean` and `FreimanDimensionSumsetBounds.lean` come from the same project, where
+they were rewritten after commit `5f4b915`.
 
 `LowerBoundFunction.lean`, `Normalize.lean`, `GeometricDeletion.lean` and the induction in
 `LowerBound.lean` are copied from DenseSetsWithoutLargeSumsets at commit `5f4b915`, where they

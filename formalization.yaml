@@ -49,15 +49,20 @@ related_formalizations:
       Lean v4.34.0-rc1 to v4.35.0-rc4 and placed in the namespace
       SumOfSetsInSeveralDimensions, and the theorem card_add_lower_bound_of_affineDim is
       renamed card_add_sum_min_le_card_add. The Freiman dimension, the rational Freiman
-      models and the bound for subsets of ZMod q of that project are not copied.
+      models, Ruzsa's bound for sets of given Freiman dimension and the bound
+      freimanDim X ≤ 2 κ - 1 were moved here from that project on 11 October 2026, in the
+      modules FreimanDimension and FreimanDimensionSumsetBounds.
 
 status:
   scope: >-
     The lower bound with the sum of minima and its closed form, for finite subsets of
     Fin D → ℝ, and lemmas on the affine dimension of a finite set: its expression as the
     rank of the vector span, monotonicity, invariance under translation, and bounds for the
-    dimension of a sumset by those of the summands and of the union. No statement that the
-    bound is attained is formalized, and no other result of the paper. The sorry counts
+    dimension of a sumset by those of the summands and of the union. The library also has the
+    definition of the Freiman dimension of a finite subset of a commutative monoid, the lower
+    bound for sets of given Freiman dimension, and the bound freimanDim X ≤ 2 κ - 1 for sets
+    with |X + X| ≤ κ |X|; these are not in Challenge.lean. No statement that the bound is
+    attained is formalized, and no other result of the paper. The sorry counts
     refer to the library and Solution.lean; Challenge.lean has one placeholder for each of
     its two statements.
   sorry_count: 0
@@ -91,6 +96,8 @@ automation:
     Claude Code, directed by Gabriel Dahia, assembled this repository: it copied that proof,
     split it into modules and ported it, and wrote the lemmas on translations and on the
     dimension of the summands, the closed form, Challenge.lean, Solution.lean and this file.
+    In a later session it moved here the modules on the Freiman dimension, which it had
+    rewritten in DenseSetsWithoutLargeSumsets from the proofs of the Codex agents.
     Every proof is checked by Lean. The solution theorems use propext, Classical.choice and
     Quot.sound only.
 
