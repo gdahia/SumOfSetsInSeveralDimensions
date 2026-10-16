@@ -20,6 +20,7 @@ sets are nonempty, and at least the affine dimension of `A ∪ B` minus one.
 
 * `finsetAffineDim_le_finsetAffineDim_add_right`, `finsetAffineDim_le_finsetAffineDim_add_left`:
   the affine dimensions of `A` and `B` are at most that of `A + B`.
+* `finsetAffineDim_add_eq_of_left_eq`: if `A ⊆ ℝ^D` has affine dimension `D`, so has `A + B`.
 * `finsetAffineDim_union_le_sum_add_one`: the affine dimension of `A ∪ B` is at most that of
   `A + B` plus one.
 -/
@@ -28,7 +29,8 @@ public section
 
 namespace SumOfSetsInSeveralDimensions
 
-open scoped Pointwise Affine
+open Finset
+open scoped Pointwise
 
 variable {D : ℕ}
 
@@ -38,9 +40,9 @@ lemma finsetAffineDim_le_finsetAffineDim_add_right (A : Finset (Fin D → ℝ))
   obtain ⟨b, hb⟩ := hB
   rw [← finsetAffineDim_image_add_right b A]
   apply finsetAffineDim_mono
-  rw [Finset.image_subset_iff]
+  rw [image_subset_iff]
   intro a ha
-  exact Finset.add_mem_add ha hb
+  exact add_mem_add ha hb
 
 /-- The affine dimension of `B` is at most that of `A + B` when `A` is nonempty. -/
 lemma finsetAffineDim_le_finsetAffineDim_add_left {A : Finset (Fin D → ℝ)} (hA : A.Nonempty)
@@ -48,45 +50,39 @@ lemma finsetAffineDim_le_finsetAffineDim_add_left {A : Finset (Fin D → ℝ)} (
   rw [add_comm]
   exact finsetAffineDim_le_finsetAffineDim_add_right B hA
 
+/-- If `A ⊆ ℝ^D` has affine dimension `D` and `B` is nonempty, then `A + B` has affine
+dimension `D`. -/
+lemma finsetAffineDim_add_eq_of_left_eq {A B : Finset (Fin D → ℝ)} (hB : B.Nonempty)
+    (hA : finsetAffineDim A = D) : finsetAffineDim (A + B) = D :=
+  le_antisymm (finsetAffineDim_le _)
+    (hA.symm.trans_le (finsetAffineDim_le_finsetAffineDim_add_right A hB))
+
+private lemma vectorSpan_union_le {A B : Finset (Fin D → ℝ)} {a b : Fin D → ℝ} (ha : a ∈ A)
+    (hb : b ∈ B) :
+    vectorSpan ℝ (↑(A ∪ B) : Set (Fin D → ℝ)) ≤
+      vectorSpan ℝ (↑(A + B) : Set (Fin D → ℝ)) ⊔ Submodule.span ℝ {b - a} := by
+  rw [vectorSpan_eq_span_vsub_set_right ℝ (p := a) (by simp [ha]), Submodule.span_le]
+  rintro v ⟨x, hx, rfl⟩
+  simp only [vsub_eq_sub, SetLike.mem_coe]
+  obtain hx | hx := mem_union.1 hx
+  · apply le_sup_left (b := Submodule.span ℝ {b - a})
+    simpa using vsub_mem_vectorSpan ℝ (mem_coe.2 (add_mem_add hx hb))
+      (mem_coe.2 (add_mem_add ha hb))
+  · rw [← sub_add_sub_cancel x b a]
+    apply Submodule.add_mem_sup _ (Submodule.mem_span_singleton_self _)
+    simpa using vsub_mem_vectorSpan ℝ (mem_coe.2 (add_mem_add ha hx))
+      (mem_coe.2 (add_mem_add ha hb))
+
 /-- The affine span of `A ∪ B` has dimension at most one more than the affine span of `A + B`. -/
-lemma finsetAffineDim_union_le_sum_add_one (A B : Finset (Fin D → ℝ))
+lemma finsetAffineDim_union_le_sum_add_one {A B : Finset (Fin D → ℝ)}
     (hA : A.Nonempty) (hB : B.Nonempty) :
     finsetAffineDim (A ∪ B) ≤ finsetAffineDim (A + B) + 1 := by
-  classical
-  rcases hA with ⟨a, ha⟩
-  rcases hB with ⟨b, hb⟩
-  let V := Fin D → ℝ
-  let U : Submodule ℝ V := (affineSpan ℝ ((A + B : Finset V) : Set V)).direction
-  let L : Submodule ℝ V := Submodule.span ℝ ({b - a} : Set V)
-  have hdir :
-      (affineSpan ℝ ((A ∪ B : Finset V) : Set V)).direction ≤ U ⊔ L := by
-    rw [direction_affineSpan, vectorSpan_eq_span_vsub_set_right ℝ
-      (s := ((A ∪ B : Finset V) : Set V)) (p := a)]
-    · apply Submodule.span_le.mpr
-      rintro v ⟨x, hx, rfl⟩
-      rw [Finset.mem_coe, Finset.mem_union] at hx
-      rcases hx with hxA | hxB
-      · apply (le_sup_left : U ≤ U ⊔ L)
-        simpa [U, vsub_eq_sub, add_sub_add_right_eq_sub] using
-          (affineSpan ℝ ((A + B : Finset V) : Set V)).vsub_mem_direction
-            (subset_affineSpan ℝ ((A + B : Finset V) : Set V) (Finset.add_mem_add hxA hb))
-            (subset_affineSpan ℝ ((A + B : Finset V) : Set V) (Finset.add_mem_add ha hb))
-      · change (x -ᵥ a : V) ∈ ↑(U ⊔ L)
-        convert (U ⊔ L).add_mem (x := x - b) (y := b - a) ?_ ?_ using 1
-        · simp only [vsub_eq_sub]
-          abel
-        · apply (le_sup_left : U ≤ U ⊔ L)
-          simpa [U, vsub_eq_sub, add_comm, add_left_comm, add_assoc] using
-            (affineSpan ℝ ((A + B : Finset V) : Set V)).vsub_mem_direction
-              (subset_affineSpan ℝ ((A + B : Finset V) : Set V) (Finset.add_mem_add ha hxB))
-              (subset_affineSpan ℝ ((A + B : Finset V) : Set V) (Finset.add_mem_add ha hb))
-        · apply (le_sup_right : L ≤ U ⊔ L)
-          apply Submodule.subset_span
-          simp
-    · simp [ha]
-  apply (Submodule.finrank_mono hdir).trans
-  apply (Submodule.finrank_add_le_finrank_add_finrank U L).trans
-  apply Nat.add_le_add_left
-  simpa [L] using finrank_span_le_card (s := ({b - a} : Set V))
+  obtain ⟨a, ha⟩ := hA
+  obtain ⟨b, hb⟩ := hB
+  rw [finsetAffineDim_eq_finrank_vectorSpan, finsetAffineDim_eq_finrank_vectorSpan]
+  apply (Submodule.finrank_mono (vectorSpan_union_le ha hb)).trans
+  apply (Submodule.finrank_add_le_finrank_add_finrank _ _).trans
+  gcongr
+  simpa using finrank_span_le_card ({b - a} : Set (Fin D → ℝ))
 
 end SumOfSetsInSeveralDimensions

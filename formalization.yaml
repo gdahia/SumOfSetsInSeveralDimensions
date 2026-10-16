@@ -6,9 +6,12 @@ project:
   description: >-
     Lean 4 formalization of Ruzsa's lower bound for sumsets in ℝ^D: if A and B are finite
     sets with B nonempty and |B| ≤ |A|, and A + B has affine dimension d, then
-    |A + B| ≥ |A| + Σ_{t=1}^{|B|-1} min(d, |A| - t). The closed form
+    |A + B| ≥ |A| + Σ_{t=1}^{|B|-1} min(d, |A| - t). The bound is attained: for d ≥ 1,
+    1 ≤ m ≤ n and n ≥ d + 1 it is the least size of A + B over sets A, B ⊆ ℝ^d of sizes m
+    and n with A + B, or B, of affine dimension d. The closed form
     |A + B| ≥ |A| + d|B| - d(d+1)/2, the asymmetric form of Freiman's lemma, is derived from
-    it.
+    the bound, and so is the bound 2κ - 1 for the Freiman dimension of a set X with
+    |X + X| ≤ κ|X|.
   authors:
     - name: "Gabriel Dahia"
       github: "gdahia"
@@ -30,11 +33,9 @@ sources:
     location: "https://doi.org/10.1007/BF01302969"
     relationship: "formalizes"
     note: >-
-      Combinatorica 14 (1994), no. 4, 485–490. The lower bound with the sum of minima and its
-      closed form. Mudgal cites the closed form as Corollary 1.1 of the paper
-      (arXiv:1902.07665, arXiv:2007.11526). The text of the paper was not available when this
-      repository was assembled, so the number of the theorem with the sum of minima is not
-      given. See fidelity.divergences.
+      Combinatorica 14 (1994), no. 4, 485–490. Theorem 1, Corollary 1.1, Lemma 2.1, the
+      formulas (1.5), (1.6) and (1.7) for G_d(m, n), and Theorem 2 with the construction of
+      Section 3. See fidelity.divergences.
     license: "unknown"
     author_endorsement: "not-contacted"
 
@@ -42,20 +43,22 @@ related_formalizations:
   - id: "https://github.com/leanprover-community/mathlib4"
     relationship: "builds-on"
     note: >-
-      Mathlib has the pointwise sum and difference of sets, `Submodule.span` and
-      `Module.finrank`, on which the compared statements are phrased. The development also uses
-      `affineSpan` and `vectorSpan` for the affine dimension, and the lexicographic order on
-      `Fin D → ℝ` for the translation of a set by its least element. Mathlib does not contain Ruzsa's lower bound or the asymmetric form
-      of Freiman's lemma; that is what this repository adds.
+      Mathlib has the pointwise sum and difference of sets, Submodule.span, Module.finrank,
+      affineSpan and vectorSpan, Freiman isomorphisms and the lexicographic order on
+      Fin D → ℝ. It has no affine dimension of a finite set, no Freiman dimension, and none of
+      the results of the paper.
 
 status:
   scope: >-
-    The lower bound with the sum of minima and its closed form, for finite subsets of
-    Fin D → ℝ, and lemmas on the affine dimension of a finite set: its expression as the
-    rank of the vector span, monotonicity, invariance under translation, and bounds for the
-    dimension of a sumset by those of the summands and of the union. The sorry counts
-    refer to the library and Solution.lean; Challenge.lean has one placeholder for each of
-    its two statements.
+    Theorem 1, Corollary 1.1, Lemma 2.1, the formulas (1.5) to (1.7) and Theorem 2 of the
+    paper, for finite subsets of Fin D → ℝ, and lemmas on the affine dimension of a finite
+    set: its expression as the rank of the vector span, monotonicity, invariance under
+    translation, and bounds for the dimension of a sumset by those of the summands and of the
+    union. The library also defines the Freiman dimension of a finite subset of a
+    commutative monoid, deduces Theorem 1 for sets of given Freiman dimension, and bounds the
+    Freiman dimension of X by 2κ - 1 when |X + X| ≤ κ|X|. The sorry counts refer to the
+    library and Solution.lean; Challenge.lean has one placeholder for each of its four
+    statements.
   sorry_count: 0
   sorry_in_definitions: 0
   axioms: ["propext", "Classical.choice", "Quot.sound"]
@@ -67,12 +70,15 @@ automation:
       framework: "Claude Code"
       tool_setup: "Lean 4, Mathlib, shell."
       cost:
-        wall_time: "one session"
+        wall_time: "three sessions"
         spend_usd: "not tracked"
         hardware: "local machine"
       prompting_notes: >-
-        One instruction to formalize Ruzsa's theorem, with the closed form and the lemmas that
-        relate the affine dimension to the vector span.
+        A first instruction to formalize Ruzsa's theorem, with the closed form and the lemmas
+        that relate the affine dimension to the vector span. Later instructions to restyle
+        the statements and proofs after Gabriel Dahia's review of other repositories, to
+        bring back the Freiman dimension, and to formalize the remaining results of the
+        paper from a copy of it.
     - method: "agent"
       models: ["gpt-5.6 sol high", "claude opus 5"]
       framework: "Codex"
@@ -81,28 +87,44 @@ automation:
         environment.
   spend_usd: "not tracked"
   notes: >-
-    The proof of the lower bound was written by AI agents. Claude Code, directed by
-    Gabriel Dahia, assembled this repository: it wrote the statements and proofs,
-    Challenge.lean, Solution.lean and this file. The solution theorems use only
-    propext, Classical.choice and Quot.sound.
+    The first proof of Theorem 1 and the Freiman dimension were written by Codex agents in
+    DenseSetsWithoutLargeSumsets. Claude Code, directed by Gabriel Dahia, assembled this
+    repository, rewrote those proofs, and wrote the remaining statements and proofs,
+    Challenge.lean, Solution.lean and this file. The solution theorems use only propext,
+    Classical.choice and Quot.sound.
 
 fidelity:
   divergences: >-
-    The ambient space is Fin D → ℝ for an arbitrary D, and d is the affine dimension of
-    A + B, the dimension of the direction of its affine span. This direction is the span of
-    the differences of the elements of A + B, and Challenge.lean writes d as the rank of that
-    span, with the pointwise difference of sets. Thus d ≤ D, and d < D is allowed. The set
-    B is assumed nonempty.
+    The paper writes |A| = m ≤ |B| = n. Theorem 1 and Corollary 1.1 are stated here with the
+    roles of A and B exchanged, |B| ≤ |A|, as the bound
+    |A| + Σ_{t=1}^{|B|-1} min(d, |A| - t) ≤ |A + B| for the sets themselves rather than for
+    the minimum F_d(m, n). The ambient space is Fin D → ℝ for an arbitrary D, and d is the
+    affine dimension of A + B, the dimension of the direction of its affine span. This
+    direction is the span of the differences of the elements of A + B, and Challenge.lean
+    writes d as the rank of that span, with the pointwise difference of sets. Thus d ≤ D,
+    and d < D is allowed. The set B is assumed nonempty instead of m + n ≥ d + 2.
 
     The closed form is stated in ℕ as |A| + d|B| ≤ |A + B| + d(d+1)/2, for every d at most
     the affine dimension of A + B. The library also has it multiplied by two, in ℝ, and
     with the maximum and the minimum of |A| and |B| when neither set is assumed to be the
-    larger. It is derived from the lower bound with the sum of minima by an induction on
-    |B|.
+    larger.
 
-    The Lean proof of the lower bound is by induction on |A| + |B|: both sets are translated
-    so that their lexicographically least elements are 0, and 0 is removed from one or both
-    of them. It was not compared with the proof in the paper.
+    The proof of Theorem 1 follows Lemma 2.1 and its four cases, with the lexicographic
+    order on Fin D → ℝ in place of a linear functional that separates the points of A ∪ B.
+
+    Formula (1.5) is proved for n - m ≥ d - 1, and the paper states it for n - m ≥ d.
+    Formulas (1.6) and (1.7) are stated multiplied by two, without division.
+
+    Theorem 2 is stated as the equality of a least element, an sInf over a set of natural
+    numbers, with G_d(m, n), for d ≥ 1, 1 ≤ m ≤ n and n ≥ d + 1. The paper also excludes the
+    pairs with m ≤ n - m ≤ d. The construction of Section 3 attains G_d(m, n) for those pairs
+    too, so they are not excluded here. In that construction, for n - m < d, the paper lists
+    the sums e_i + e_j with 2 ≤ i, j ≤ k and counts k(k - 1)/2 of them, but the sums with
+    i ≤ k < j occur as well; the final value of |A + B| in the paper, G_d(m, n), is correct
+    and is the one proved here. The set A is {0, e₁, …, (m - k) e₁} ∪ {e₂, …, e_k} with
+    k = max(1, d - (n - m)), which for n - m ≥ d is the set {0, …, (m - 1) e₁} of the paper.
+
+    The Freiman dimension and its bound by the doubling are not in the paper.
 
 review:
   status: "unchecked"
@@ -113,25 +135,62 @@ review:
 alignment:
   namespace: "SumOfSetsInSeveralDimensions"
   statements:
-    - source: "The lower bound with the sum of minima"
+    - source: "Theorem 1"
       lean: "SumOfSetsInSeveralDimensions.card_add_sum_min_le_card_add_of_finrank_span_sub_eq"
       module: "Challenge"
       status: "proved"
-      note: "With d the rank of the span of the differences of A + B."
-    - source: "The closed form, cited by Mudgal as Corollary 1.1"
+      note: "With |B| ≤ |A| and d the rank of the span of the differences of A + B."
+    - source: "Corollary 1.1"
       lean: "SumOfSetsInSeveralDimensions.card_add_mul_card_le_card_add_add_of_le_finrank_span_sub"
       module: "Challenge"
       status: "proved"
       note: "For every d at most the rank of the span of the differences of A + B."
-    - source: "The lower bound with the sum of minima, library form"
+    - source: "Theorem 2, F_d(m, n) = G_d(m, n)"
+      lean: "SumOfSetsInSeveralDimensions.sInf_card_add_eq_add_sum_min"
+      module: "Challenge"
+      status: "proved"
+      note: "For d ≥ 1, 1 ≤ m ≤ n and n ≥ d + 1."
+    - source: "Theorem 2, F'_d(m, n) = G_d(m, n)"
+      lean: "SumOfSetsInSeveralDimensions.sInf_card_add_of_finrank_span_sub_right_eq_add_sum_min"
+      module: "Challenge"
+      status: "proved"
+      note: "For d ≥ 1, 1 ≤ m ≤ n and n ≥ d + 1."
+    - source: "Theorem 1, library form"
       lean: "SumOfSetsInSeveralDimensions.card_add_sum_min_le_card_add"
       module: "SumOfSetsInSeveralDimensions.LowerBound"
       status: "proved"
       note: "With d = finsetAffineDim (A + B)."
-    - source: "The closed form, library form"
+    - source: "Corollary 1.1, library form"
       lean: "SumOfSetsInSeveralDimensions.card_add_mul_card_le_card_add_add"
       module: "SumOfSetsInSeveralDimensions.ClosedForm"
       status: "proved"
       note: "With d ≤ finsetAffineDim (A + B)."
+    - source: "Lemma 2.1"
+      lean: "SumOfSetsInSeveralDimensions.geometric_deletion_cases"
+      module: "SumOfSetsInSeveralDimensions.GeometricDeletion"
+      status: "proved"
+      note: "For sets that contain 0 and whose other points are lexicographically positive."
+    - source: "Formula (1.5)"
+      lean: "SumOfSetsInSeveralDimensions.sumsetCardLowerBound_of_add_le"
+      module: "SumOfSetsInSeveralDimensions.LowerBoundValues"
+      status: "proved"
+    - source: "Formula (1.6)"
+      lean: "SumOfSetsInSeveralDimensions.two_mul_sumsetCardLowerBound_add_add"
+      module: "SumOfSetsInSeveralDimensions.LowerBoundValues"
+      status: "proved"
+      note: "The first expression of (1.6) is two_mul_sumsetCardLowerBound_add."
+    - source: "Formula (1.7)"
+      lean: "SumOfSetsInSeveralDimensions.two_mul_sumsetCardLowerBound_of_le"
+      module: "SumOfSetsInSeveralDimensions.LowerBoundValues"
+      status: "proved"
+    - source: "Section 3"
+      lean: "SumOfSetsInSeveralDimensions.exists_card_add_eq_sumsetCardLowerBound"
+      module: "SumOfSetsInSeveralDimensions.Construction"
+      status: "proved"
+    - source: "Theorem 2, library form"
+      lean: "SumOfSetsInSeveralDimensions.minCardAdd_eq_sumsetCardLowerBound"
+      module: "SumOfSetsInSeveralDimensions.MinCardAdd"
+      status: "proved"
+      note: "minCardAddOfDimRight_eq_sumsetCardLowerBound is the statement for F'_d."
 
 acknowledgements: "Lean 4 and Mathlib; the Palomar registry template."

@@ -38,6 +38,7 @@ the differences of the points of `S`.
 
 namespace SumOfSetsInSeveralDimensions
 
+open Finset
 open scoped Pointwise
 
 variable {D : ℕ}
@@ -77,7 +78,7 @@ lemma finsetAffineDim_singleton (x : Fin D → ℝ) : finsetAffineDim {x} = 0 :=
 @[simp]
 lemma finsetAffineDim_vadd_finset (c : Fin D → ℝ) (S : Finset (Fin D → ℝ)) :
     finsetAffineDim (c +ᵥ S) = finsetAffineDim S := by
-  rw [finsetAffineDim_eq_finrank_vectorSpan, Finset.coe_vadd_finset, vectorSpan_vadd,
+  rw [finsetAffineDim_eq_finrank_vectorSpan, coe_vadd_finset, vectorSpan_vadd,
     finsetAffineDim_eq_finrank_vectorSpan]
 
 /-- The affine dimension of `c + S` is that of `S`. -/
@@ -96,23 +97,17 @@ lemma finsetAffineDim_image_sub (S : Finset (Fin D → ℝ)) (c : Fin D → ℝ)
   simp only [sub_eq_add_neg, finsetAffineDim_image_add_right]
 
 /-- A nonempty finite set of affine dimension `d` contains at least `d + 1` points. -/
-lemma finsetAffineDim_add_one_le_card (S : Finset (Fin D → ℝ))
-    (hS : S.Nonempty) : finsetAffineDim S + 1 ≤ S.card := by
-  classical
-  let : Nonempty S := hS.to_subtype
-  let p : S → (Fin D → ℝ) := Subtype.val
-  have hp : Set.range p = (S : Set (Fin D → ℝ)) := by
-    ext x
-    simp [p]
-  unfold finsetAffineDim
-  rw [direction_affineSpan, ← hp]
-  simpa only [Fintype.card_coe] using finrank_vectorSpan_range_add_one_le ℝ p
+lemma finsetAffineDim_add_one_le_card {S : Finset (Fin D → ℝ)} (hS : S.Nonempty) :
+    finsetAffineDim S + 1 ≤ #S := by
+  have : Nonempty (S : Set (Fin D → ℝ)) := hS.to_set.to_subtype
+  have h := finrank_vectorSpan_range_add_one_le ℝ ((↑) : ↥(S : Set (Fin D → ℝ)) → Fin D → ℝ)
+  rw [Subtype.range_coe, ← finsetAffineDim_eq_finrank_vectorSpan] at h
+  simpa using h
 
 /-- The affine dimension of a finite set is at most its number of points. -/
-lemma finsetAffineDim_le_card (S : Finset (Fin D → ℝ)) :
-    finsetAffineDim S ≤ S.card := by
-  by_cases hS : S.Nonempty
-  · exact (Nat.le_add_right _ _).trans (finsetAffineDim_add_one_le_card S hS)
-  · simp [Finset.not_nonempty_iff_eq_empty.mp hS, finsetAffineDim]
+lemma finsetAffineDim_le_card (S : Finset (Fin D → ℝ)) : finsetAffineDim S ≤ #S := by
+  obtain rfl | hS := S.eq_empty_or_nonempty
+  · simp
+  · grind [finsetAffineDim_add_one_le_card hS]
 
 end SumOfSetsInSeveralDimensions

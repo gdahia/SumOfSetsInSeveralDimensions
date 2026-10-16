@@ -22,41 +22,29 @@ public section
 
 namespace SumOfSetsInSeveralDimensions
 
+open Finset
 open scoped Pointwise
-
-section LexicographicMinimum
 
 variable {D : ℕ}
 
 private noncomputable def lexMin (S : Finset (Fin D → ℝ)) (hS : S.Nonempty) : Fin D → ℝ :=
-  by
-    refine ofLex ((S.image toLex).min' ?_)
-    simpa
+  ofLex ((S.image toLex).min' (hS.image toLex))
 
-private lemma lexMin_mem (S : Finset (Fin D → ℝ)) (hS : S.Nonempty) : lexMin S hS ∈ S := by
-  rw [lexMin]
-  obtain ⟨x, hx, hxmin⟩ := Finset.mem_image.mp (Finset.min'_mem (S.image toLex) _)
-  rw [← hxmin, ofLex_toLex]
-  exact hx
+private lemma lexMin_mem {S : Finset (Fin D → ℝ)} (hS : S.Nonempty) : lexMin S hS ∈ S := by
+  obtain ⟨x, hx, hxmin⟩ := mem_image.1 (min'_mem (S.image toLex) (hS.image toLex))
+  rwa [lexMin, ← hxmin, ofLex_toLex]
 
-private lemma lexMin_le (S : Finset (Fin D → ℝ)) (hS : S.Nonempty) {x : Fin D → ℝ}
+private lemma lexMin_le {S : Finset (Fin D → ℝ)} (hS : S.Nonempty) {x : Fin D → ℝ}
     (hx : x ∈ S) : toLex (lexMin S hS) ≤ toLex x := by
   rw [lexMin, toLex_ofLex]
-  apply Finset.min'_le
-  exact Finset.mem_image.2 ⟨x, hx, rfl⟩
+  exact min'_le _ _ (mem_image_of_mem toLex hx)
 
-private lemma lexMin_sub_pos (S : Finset (Fin D → ℝ)) (hS : S.Nonempty)
+private lemma lexMin_sub_pos {S : Finset (Fin D → ℝ)} (hS : S.Nonempty)
     {x : Fin D → ℝ} (hx : x ∈ S) (hne : x ≠ lexMin S hS) :
     0 < toLex (x - lexMin S hS) := by
   rw [toLex_sub, sub_pos]
-  apply (lexMin_le S hS hx).lt_of_ne
+  apply (lexMin_le hS hx).lt_of_ne
   simpa using hne.symm
-
-end LexicographicMinimum
-
-section Normalize
-
-variable {D : ℕ}
 
 /-- The translate of a nonempty finite set `S ⊆ ℝ^D` by minus its lexicographically least
 element. -/
@@ -64,69 +52,46 @@ noncomputable def normalize (S : Finset (Fin D → ℝ)) (hS : S.Nonempty) : Fin
   S.image fun x ↦ x - lexMin S hS
 
 /-- Translation does not change the number of points. -/
-lemma normalize_card (S : Finset (Fin D → ℝ)) (hS : S.Nonempty) :
-    (normalize S hS).card = S.card := by
-  rw [normalize, Finset.card_image_of_injective]
-  intro x y hxy
-  exact sub_left_injective hxy
+lemma normalize_card {S : Finset (Fin D → ℝ)} (hS : S.Nonempty) : #(normalize S hS) = #S :=
+  card_image_of_injective _ (sub_left_injective (b := lexMin S hS))
 
 /-- The translated set contains the origin. -/
-lemma zero_mem_normalize (S : Finset (Fin D → ℝ)) (hS : S.Nonempty) :
-    0 ∈ normalize S hS := by
-  rw [normalize, Finset.mem_image]
-  exact ⟨lexMin S hS, lexMin_mem S hS, sub_self _⟩
+lemma zero_mem_normalize {S : Finset (Fin D → ℝ)} (hS : S.Nonempty) : 0 ∈ normalize S hS :=
+  mem_image.2 ⟨lexMin S hS, lexMin_mem hS, sub_self _⟩
 
 /-- The translated set is nonempty. -/
-lemma normalize_nonempty (S : Finset (Fin D → ℝ)) (hS : S.Nonempty) :
-    (normalize S hS).Nonempty := ⟨0, zero_mem_normalize S hS⟩
+lemma normalize_nonempty {S : Finset (Fin D → ℝ)} (hS : S.Nonempty) :
+    (normalize S hS).Nonempty :=
+  ⟨0, zero_mem_normalize hS⟩
 
 /-- The nonzero elements of the translated set are lexicographically positive. -/
-lemma normalize_pos_of_ne_zero (S : Finset (Fin D → ℝ)) (hS : S.Nonempty)
+lemma normalize_pos_of_ne_zero {S : Finset (Fin D → ℝ)} (hS : S.Nonempty)
     {x : Fin D → ℝ} (hx : x ∈ normalize S hS) (hx0 : x ≠ 0) : 0 < toLex x := by
-  rw [normalize, Finset.mem_image] at hx
-  obtain ⟨y, hy, rfl⟩ := hx
-  apply lexMin_sub_pos S hS hy
-  intro hymin
-  apply hx0
-  rw [hymin, sub_self]
+  obtain ⟨y, hy, rfl⟩ := mem_image.1 hx
+  apply lexMin_sub_pos hS hy
+  rintro rfl
+  exact hx0 (sub_self _)
 
-private lemma normalize_add (A B : Finset (Fin D → ℝ)) (hA : A.Nonempty) (hB : B.Nonempty) :
+private lemma normalize_add {A B : Finset (Fin D → ℝ)} (hA : A.Nonempty) (hB : B.Nonempty) :
     normalize A hA + normalize B hB =
       (A + B).image fun x ↦ x - (lexMin A hA + lexMin B hB) := by
   ext x
+  simp only [normalize, mem_add, mem_image]
   constructor
-  · intro hx
-    rw [Finset.mem_add] at hx
-    obtain ⟨a, ha, b, hb, rfl⟩ := hx
-    rw [normalize, Finset.mem_image] at ha hb
-    obtain ⟨a', ha', rfl⟩ := ha
-    obtain ⟨b', hb', rfl⟩ := hb
-    rw [Finset.mem_image]
-    refine ⟨a' + b', Finset.add_mem_add ha' hb', ?_⟩
-    abel
-  · intro hx
-    rw [Finset.mem_image] at hx
-    obtain ⟨z, hz, rfl⟩ := hx
-    rw [Finset.mem_add] at hz ⊢
-    obtain ⟨a, ha, b, hb, rfl⟩ := hz
-    refine ⟨a - lexMin A hA, ?_, b - lexMin B hB, ?_, ?_⟩
-    · exact Finset.mem_image.2 ⟨a, ha, rfl⟩
-    · exact Finset.mem_image.2 ⟨b, hb, rfl⟩
-    · abel
+  · rintro ⟨_, ⟨a, ha, rfl⟩, _, ⟨b, hb, rfl⟩, rfl⟩
+    exact ⟨a + b, ⟨a, ha, b, hb, rfl⟩, by abel⟩
+  · rintro ⟨_, ⟨a, ha, b, hb, rfl⟩, rfl⟩
+    exact ⟨a - lexMin A hA, ⟨a, ha, rfl⟩, b - lexMin B hB, ⟨b, hb, rfl⟩, by abel⟩
 
 /-- The sum of the translates of `A` and `B` has as many points as `A + B`. -/
-lemma normalize_add_card (A B : Finset (Fin D → ℝ)) (hA : A.Nonempty)
-    (hB : B.Nonempty) : (normalize A hA + normalize B hB).card = (A + B).card := by
-  rw [normalize_add, Finset.card_image_of_injective]
-  intro x y hxy
-  exact sub_left_injective hxy
+lemma normalize_add_card {A B : Finset (Fin D → ℝ)} (hA : A.Nonempty) (hB : B.Nonempty) :
+    #(normalize A hA + normalize B hB) = #(A + B) := by
+  rw [normalize_add]
+  exact card_image_of_injective _ sub_left_injective
 
 /-- The sum of the translates of `A` and `B` has the affine dimension of `A + B`. -/
-lemma normalize_add_dim (A B : Finset (Fin D → ℝ)) (hA : A.Nonempty)
-    (hB : B.Nonempty) :
+lemma normalize_add_dim {A B : Finset (Fin D → ℝ)} (hA : A.Nonempty) (hB : B.Nonempty) :
     finsetAffineDim (normalize A hA + normalize B hB) = finsetAffineDim (A + B) := by
   rw [normalize_add, finsetAffineDim_image_sub]
-
-end Normalize
 
 end SumOfSetsInSeveralDimensions

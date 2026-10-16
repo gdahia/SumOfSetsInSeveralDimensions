@@ -48,58 +48,55 @@ private lemma sum_min_add_le {d k n : ℕ} (hkn : k + 2 ≤ n) :
   rw [sum_Icc_succ_top (by grind)]
   grind
 
-private lemma two_mul_mul_succ_le (k : ℕ) : ∀ d n, k + 1 ≤ n →
+private lemma two_mul_mul_succ_le {k d n : ℕ} (hn : k + 1 ≤ n) :
     2 * (d * (k + 1)) ≤ 2 * ∑ t ∈ Icc 1 k, min d (n - t) + d * (d + 1) := by
-  induction k with
-  | zero =>
-    intro d n _
-    simp only [zero_add, mul_one, Nat.lt_one_iff, Icc_eq_empty_of_lt, sum_empty, mul_zero]
-    grind [Nat.le_mul_self d]
+  induction k generalizing d n with
+  | zero => grind [Nat.le_mul_self d]
   | succ k ih =>
-    rintro (_ | d) n hn
+    obtain _ | d := d
     · simp
-    · grind [ih d (n - 1) (by grind), sum_min_add_le (d := d) hn]
+    · grind [ih (d := d) (n := n - 1) (by grind), sum_min_add_le (d := d) hn]
 
 /-- For `1 ≤ m ≤ n`, twice the sum `∑ t ∈ {1, …, m - 1}, min d (n - t)` is at least
 `2 * d * m - d * (d + 1)`. -/
 lemma two_mul_mul_le_two_mul_sum_min_add (d : ℕ) {m n : ℕ} (hm : 1 ≤ m) (hmn : m ≤ n) :
     2 * (d * m) ≤ 2 * ∑ t ∈ Icc 1 (m - 1), min d (n - t) + d * (d + 1) := by
   obtain ⟨k, rfl⟩ := Nat.exists_eq_add_one.2 hm
-  exact two_mul_mul_succ_le k d n hmn
+  exact two_mul_mul_succ_le hmn
 
-variable {D d : ℕ}
+variable {D d : ℕ} {A B : Finset (Fin D → ℝ)}
 
 /-- The closed form of Ruzsa's bound, multiplied by two: `2 * (|A| + d * |B|)` is at most
 `2 * |A + B| + d * (d + 1)`. -/
-lemma two_mul_card_add_mul_card_le (A B : Finset (Fin D → ℝ)) (hB : B.Nonempty) (hBA : #B ≤ #A)
+lemma two_mul_card_add_mul_card_le (hB : B.Nonempty) (hBA : #B ≤ #A)
     (hd : d ≤ finsetAffineDim (A + B)) : 2 * (#A + d * #B) ≤ 2 * #(A + B) + d * (d + 1) := by
-  grind [card_add_sum_min_le_card_add_of_le A B hB hBA hd,
+  grind [card_add_sum_min_le_card_add_of_le hB hBA hd,
     two_mul_mul_le_two_mul_sum_min_add d hB.card_pos hBA]
 
-/-- **The asymmetric form of Freiman's lemma.** Let `A, B ⊆ ℝ^D` be finite sets with `B` nonempty
-and `|B| ≤ |A|`, and let `d` be at most the affine dimension of `A + B`. Then
+/-- **The asymmetric form of Freiman's lemma.** If `A, B ⊆ ℝ^D` are finite, `B` is nonempty,
+`|B| ≤ |A|` and `A + B` has affine dimension at least `d`, then
 `|A| + d * |B| ≤ |A + B| + d * (d + 1) / 2`. -/
-theorem card_add_mul_card_le_card_add_add (A B : Finset (Fin D → ℝ)) (hB : B.Nonempty)
-    (hBA : #B ≤ #A) (hd : d ≤ finsetAffineDim (A + B)) :
+theorem card_add_mul_card_le_card_add_add (hB : B.Nonempty) (hBA : #B ≤ #A)
+    (hd : d ≤ finsetAffineDim (A + B)) :
     #A + d * #B ≤ #(A + B) + d * (d + 1) / 2 := by
-  grind [two_mul_card_add_mul_card_le A B hB hBA hd]
+  grind [two_mul_card_add_mul_card_le hB hBA hd]
 
 /-- The asymmetric form of Freiman's lemma in `ℝ`: `|A| + d * |B| - d * (d + 1) / 2 ≤ |A + B|`. -/
-lemma card_add_mul_card_sub_le_card_add (A B : Finset (Fin D → ℝ)) (hB : B.Nonempty)
-    (hBA : #B ≤ #A) (hd : d ≤ finsetAffineDim (A + B)) :
+lemma card_add_mul_card_sub_le_card_add (hB : B.Nonempty) (hBA : #B ≤ #A)
+    (hd : d ≤ finsetAffineDim (A + B)) :
     (#A : ℝ) + d * #B - d * (d + 1) / 2 ≤ #(A + B) := by
   have h : (2 * (#A + d * #B) : ℝ) ≤ 2 * #(A + B) + d * (d + 1) :=
-    mod_cast two_mul_card_add_mul_card_le A B hB hBA hd
+    mod_cast two_mul_card_add_mul_card_le hB hBA hd
   linarith
 
 /-- The asymmetric form of Freiman's lemma without an assumption on which set is larger. -/
-lemma max_card_add_mul_min_card_le_card_add_add (A B : Finset (Fin D → ℝ)) (hA : A.Nonempty)
-    (hB : B.Nonempty) (hd : d ≤ finsetAffineDim (A + B)) :
+lemma max_card_add_mul_min_card_le_card_add_add (hA : A.Nonempty) (hB : B.Nonempty)
+    (hd : d ≤ finsetAffineDim (A + B)) :
     max #A #B + d * min #A #B ≤ #(A + B) + d * (d + 1) / 2 := by
   rcases le_total #B #A with h | h
   · rw [max_eq_left h, min_eq_right h]
-    exact card_add_mul_card_le_card_add_add A B hB h hd
+    exact card_add_mul_card_le_card_add_add hB h hd
   · rw [max_eq_right h, min_eq_left h, add_comm A B]
-    exact card_add_mul_card_le_card_add_add B A hA h (add_comm A B ▸ hd)
+    exact card_add_mul_card_le_card_add_add hA h (add_comm A B ▸ hd)
 
 end SumOfSetsInSeveralDimensions
