@@ -39,19 +39,19 @@ open scoped Pointwise
 
 variable {D d : ℕ} {X Y : Finset (Fin D → ℝ)} {x₀ y₀ : Fin D → ℝ}
 
-private lemma finsetAffineDim_le_finrank_of_sub_mem {S : Finset (Fin D → ℝ)}
+private lemma affineDim_le_finrank_of_sub_mem {S : Finset (Fin D → ℝ)}
     {U : Submodule ℝ (Fin D → ℝ)} {p : Fin D → ℝ} (hp : p ∈ S) (hS : ∀ x ∈ S, x - p ∈ U) :
-    finsetAffineDim S ≤ Module.finrank ℝ U := by
-  rw [finsetAffineDim_eq_finrank_vectorSpan, vectorSpan_eq_span_vsub_set_right ℝ (mem_coe.2 hp)]
+    S.affineDim ≤ Module.finrank ℝ U := by
+  rw [affineDim_eq_finrank_vectorSpan, vectorSpan_eq_span_vsub_set_right ℝ (mem_coe.2 hp)]
   apply Submodule.finrank_mono
   rw [Submodule.span_le]
   rintro _ ⟨x, hx, rfl⟩
   exact hS x hx
 
-private lemma finsetAffineDim_add_le_finrank (h0X : 0 ∈ X) (h0Y : 0 ∈ Y)
+private lemma affineDim_add_le_finrank (h0X : 0 ∈ X) (h0Y : 0 ∈ Y)
     {W : Submodule ℝ (Fin D → ℝ)} (hX : ∀ x ∈ X, x ∈ W) (hY : ∀ y ∈ Y, y ∈ W) :
-    finsetAffineDim (X + Y) ≤ Module.finrank ℝ W := by
-  refine finsetAffineDim_le_finrank_of_sub_mem (p := 0) (by simpa using add_mem_add h0X h0Y) ?_
+    (X + Y).affineDim ≤ Module.finrank ℝ W := by
+  refine affineDim_le_finrank_of_sub_mem (p := 0) (by simpa using add_mem_add h0X h0Y) ?_
   intro z hz
   obtain ⟨x, hx, y, hy, rfl⟩ := mem_add.1 hz
   simpa using W.add_mem (hX x hx) (hY y hy)
@@ -143,9 +143,9 @@ private lemma insert_union_deletedComplement_subset (h0X : 0 ∈ X) (h0Y : 0 ∈
 
 private lemma card_erase_add_erase_add_le (h0X : 0 ∈ X) (h0Y : 0 ∈ Y)
     (hposX : ∀ x ∈ X, x ≠ 0 → 0 < toLex x) (hposY : ∀ y ∈ Y, y ≠ 0 → 0 < toLex y) :
-    #(X.erase 0 + Y.erase 0) + finsetAffineDim (X + Y) + 1 ≤ #(X + Y) := by
-  have hC : finsetAffineDim (X + Y) ≤ #(deletedComplement X Y) := by
-    refine (finsetAffineDim_le_finrank_of_sub_mem (p := 0)
+    #(X.erase 0 + Y.erase 0) + (X + Y).affineDim + 1 ≤ #(X + Y) := by
+  have hC : (X + Y).affineDim ≤ #(deletedComplement X Y) := by
+    refine (affineDim_le_finrank_of_sub_mem (p := 0)
       (by simpa using add_mem_add h0X h0Y) ?_).trans (finrank_span_finset_le_card _)
     intro z hz
     simpa using mem_span_deletedComplement h0X h0Y hposX hposY hz
@@ -162,8 +162,8 @@ private noncomputable def deletedSpan (X Y : Finset (Fin D → ℝ)) : Submodule
   vectorSpan ℝ (↑(X.erase 0 + Y.erase 0) : Set (Fin D → ℝ))
 
 private lemma finrank_deletedSpan :
-    Module.finrank ℝ (deletedSpan X Y) = finsetAffineDim (X.erase 0 + Y.erase 0) :=
-  (finsetAffineDim_eq_finrank_vectorSpan _).symm
+    Module.finrank ℝ (deletedSpan X Y) = (X.erase 0 + Y.erase 0).affineDim :=
+  (affineDim_eq_finrank_vectorSpan _).symm
 
 private lemma sub_mem_deletedSpan_left (hx₀ : x₀ ∈ X.erase 0) (hy₀ : y₀ ∈ Y.erase 0)
     {x : Fin D → ℝ} (hx : x ∈ X.erase 0) : x - x₀ ∈ deletedSpan X Y := by
@@ -195,10 +195,10 @@ private lemma mem_of_le_right (hx₀ : x₀ ∈ X.erase 0) (hy₀ : y₀ ∈ Y.e
   rw [← sub_add_cancel y y₀]
   exact W.add_mem (hUW (sub_mem_deletedSpan_right hx₀ hy₀ (mem_erase.2 ⟨hy0, hy⟩))) hy₀W
 
-private lemma finsetAffineDim_add_le_add_two (h0X : 0 ∈ X) (h0Y : 0 ∈ Y)
+private lemma affineDim_add_le_add_two (h0X : 0 ∈ X) (h0Y : 0 ∈ Y)
     (hx₀ : x₀ ∈ X.erase 0) (hy₀ : y₀ ∈ Y.erase 0) :
-    finsetAffineDim (X + Y) ≤ finsetAffineDim (X.erase 0 + Y.erase 0) + 2 := by
-  refine (finsetAffineDim_add_le_finrank h0X h0Y
+    (X + Y).affineDim ≤ (X.erase 0 + Y.erase 0).affineDim + 2 := by
+  refine (affineDim_add_le_finrank h0X h0Y
     (W := deletedSpan X Y ⊔ ℝ ∙ x₀ ⊔ ℝ ∙ y₀) ?_ ?_).trans ?_
   · intro x hx
     exact mem_of_le_left hx₀ hy₀ (le_sup_left.trans le_sup_left)
@@ -212,29 +212,29 @@ private lemma finsetAffineDim_add_le_add_two (h0X : 0 ∈ X) (h0Y : 0 ∈ Y)
 /-- The case in which `x₀ ∈ U`: then `X ⊆ U`, and `X + Y'` lies in the translate `U + y₀`, which
 does not meet `U`. -/
 private lemma deletion_right_of_mem (h0X : 0 ∈ X) (h0Y : 0 ∈ Y) (hx₀ : x₀ ∈ X.erase 0)
-    (hy₀ : y₀ ∈ Y.erase 0) (hdim : finsetAffineDim (X + Y) = d)
-    (hlt : finsetAffineDim (X.erase 0 + Y.erase 0) < d) (hxU : x₀ ∈ deletedSpan X Y) :
-    finsetAffineDim (X + Y.erase 0) = d - 1 ∧ #X + #(X + Y.erase 0) ≤ #(X + Y) := by
+    (hy₀ : y₀ ∈ Y.erase 0) (hdim : (X + Y).affineDim = d)
+    (hlt : (X.erase 0 + Y.erase 0).affineDim < d) (hxU : x₀ ∈ deletedSpan X Y) :
+    (X + Y.erase 0).affineDim = d - 1 ∧ #X + #(X + Y.erase 0) ≤ #(X + Y) := by
   have hX : ∀ x ∈ X, x ∈ deletedSpan X Y := fun x hx ↦ mem_of_le_left hx₀ hy₀ le_rfl hxU hx
   have hyU : y₀ ∉ deletedSpan X Y := by
     intro hyU
-    grind [finsetAffineDim_add_le_finrank h0X h0Y hX
+    grind [affineDim_add_le_finrank h0X h0Y hX
       (fun y hy ↦ mem_of_le_right hx₀ hy₀ le_rfl hyU hy), finrank_deletedSpan (X := X) (Y := Y)]
-  have hd : d ≤ finsetAffineDim (X.erase 0 + Y.erase 0) + 1 := by
-    grind [finsetAffineDim_add_le_finrank h0X h0Y (W := deletedSpan X Y ⊔ ℝ ∙ y₀)
+  have hd : d ≤ (X.erase 0 + Y.erase 0).affineDim + 1 := by
+    grind [affineDim_add_le_finrank h0X h0Y (W := deletedSpan X Y ⊔ ℝ ∙ y₀)
       (fun x hx ↦ Submodule.mem_sup_left (hX x hx))
       (fun y hy ↦ mem_of_le_right hx₀ hy₀ le_sup_left
         (Submodule.mem_sup_right (Submodule.mem_span_singleton_self y₀)) hy),
       finrank_sup_span_singleton_le (deletedSpan X Y) y₀, finrank_deletedSpan (X := X) (Y := Y)]
   refine ⟨le_antisymm ?_ ?_, ?_⟩
-  · refine (finsetAffineDim_le_finrank_of_sub_mem (U := deletedSpan X Y)
+  · refine (affineDim_le_finrank_of_sub_mem (U := deletedSpan X Y)
       (by simpa using add_mem_add h0X hy₀) ?_).trans ?_
     · intro z hz
       obtain ⟨x, hx, y, hy, rfl⟩ := mem_add.1 hz
       rw [add_sub_assoc]
       exact Submodule.add_mem _ (hX x hx) (sub_mem_deletedSpan_right hx₀ hy₀ hy)
     · grind [finrank_deletedSpan (X := X) (Y := Y)]
-  · grind [finsetAffineDim_mono (add_subset_add_right (t := Y.erase 0) (erase_subset 0 X))]
+  · grind [affineDim_mono (add_subset_add_right (t := Y.erase 0) (erase_subset 0 X))]
   · rw [← card_union_of_disjoint]
     · refine card_le_card (union_subset ?_ (add_subset_add_left (erase_subset _ _)))
       intro x hx
@@ -264,31 +264,31 @@ private lemma card_add_card_erase_add_erase_le (hposX : ∀ x ∈ X, x ≠ 0 →
     exact Submodule.sub_mem _ (sub_mem_deletedSpan_right hx₀ hy₀ (mem_erase.2 ⟨hz0, hzY⟩))
       (sub_add_mem_deletedSpan hx₀ hy₀ hz)
 
-private lemma notMem_sup_of_finsetAffineDim_eq (h0X : 0 ∈ X) (h0Y : 0 ∈ Y)
-    (hx₀ : x₀ ∈ X.erase 0) (hy₀ : y₀ ∈ Y.erase 0) (hdim : finsetAffineDim (X + Y) = d)
-    (hdel : finsetAffineDim (X.erase 0 + Y.erase 0) + 2 = d) :
+private lemma notMem_sup_of_affineDim_eq (h0X : 0 ∈ X) (h0Y : 0 ∈ Y)
+    (hx₀ : x₀ ∈ X.erase 0) (hy₀ : y₀ ∈ Y.erase 0) (hdim : (X + Y).affineDim = d)
+    (hdel : (X.erase 0 + Y.erase 0).affineDim + 2 = d) :
     y₀ ∉ deletedSpan X Y ⊔ ℝ ∙ x₀ := by
   intro hyW
-  grind [finsetAffineDim_add_le_finrank h0X h0Y
+  grind [affineDim_add_le_finrank h0X h0Y
     (fun x hx ↦ mem_of_le_left hx₀ hy₀ le_sup_left
       (Submodule.mem_sup_right (Submodule.mem_span_singleton_self x₀)) hx)
     (fun y hy ↦ mem_of_le_right hx₀ hy₀ le_sup_left hyW hy),
     finrank_sup_span_singleton_le (deletedSpan X Y) x₀, finrank_deletedSpan (X := X) (Y := Y)]
 
-private lemma finsetAffineDim_erase_add_eq (h0Y : 0 ∈ Y) (hx₀ : x₀ ∈ X.erase 0)
+private lemma affineDim_erase_add_eq (h0Y : 0 ∈ Y) (hx₀ : x₀ ∈ X.erase 0)
     (hy₀ : y₀ ∈ Y.erase 0) (hyW : y₀ ∉ deletedSpan X Y ⊔ ℝ ∙ x₀) :
-    finsetAffineDim (X.erase 0 + Y) = finsetAffineDim (X.erase 0 + Y.erase 0) + 1 := by
+    (X.erase 0 + Y).affineDim = (X.erase 0 + Y.erase 0).affineDim + 1 := by
   rw [← finrank_deletedSpan, ← Submodule.finrank_sup_span_singleton
     (fun h ↦ hyW (Submodule.mem_sup_left h))]
   apply le_antisymm
-  · refine finsetAffineDim_le_finrank_of_sub_mem (by simpa using add_mem_add hx₀ h0Y) ?_
+  · refine affineDim_le_finrank_of_sub_mem (by simpa using add_mem_add hx₀ h0Y) ?_
     intro z hz
     obtain ⟨x, hx, y, hy, rfl⟩ := mem_add.1 hz
     rw [add_sub_right_comm]
     exact Submodule.add_mem _ (Submodule.mem_sup_left (sub_mem_deletedSpan_left hx₀ hy₀ hx))
       (mem_of_le_right hx₀ hy₀ le_sup_left
         (Submodule.mem_sup_right (Submodule.mem_span_singleton_self y₀)) hy)
-  · rw [finsetAffineDim_eq_finrank_vectorSpan]
+  · rw [affineDim_eq_finrank_vectorSpan]
     apply Submodule.finrank_mono
     refine sup_le (vectorSpan_mono ℝ (coe_subset.2 (add_subset_add_left (erase_subset _ _)))) ?_
     rw [Submodule.span_singleton_le_iff_mem]
@@ -330,20 +330,20 @@ fewer points, or a sumset of dimension `d - 1` with at least `|Y|` or `|X|` fewe
 listed in the statement. -/
 lemma geometric_deletion_cases (h0X : 0 ∈ X) (h0Y : 0 ∈ Y)
     (hposX : ∀ x ∈ X, x ≠ 0 → 0 < toLex x) (hposY : ∀ y ∈ Y, y ≠ 0 → 0 < toLex y)
-    (hXcard : 2 ≤ #X) (hYcard : 2 ≤ #Y) (hdim : finsetAffineDim (X + Y) = d) :
-    (finsetAffineDim (X.erase 0 + Y.erase 0) = d ∧
+    (hXcard : 2 ≤ #X) (hYcard : 2 ≤ #Y) (hdim : (X + Y).affineDim = d) :
+    ((X.erase 0 + Y.erase 0).affineDim = d ∧
       #(X.erase 0 + Y.erase 0) + d + 1 ≤ #(X + Y)) ∨
-      (finsetAffineDim (X.erase 0 + Y.erase 0) = d - 1 ∧
+      ((X.erase 0 + Y.erase 0).affineDim = d - 1 ∧
         #Y + #(X.erase 0 + Y.erase 0) ≤ #(X + Y)) ∨
-      (finsetAffineDim (X.erase 0 + Y) = d - 1 ∧ #Y + #(X.erase 0 + Y) ≤ #(X + Y)) ∨
-      (finsetAffineDim (X + Y.erase 0) = d - 1 ∧ #X + #(X + Y.erase 0) ≤ #(X + Y)) := by
-  obtain hdel | hdel := eq_or_ne (finsetAffineDim (X.erase 0 + Y.erase 0)) d
+      ((X.erase 0 + Y).affineDim = d - 1 ∧ #Y + #(X.erase 0 + Y) ≤ #(X + Y)) ∨
+      ((X + Y.erase 0).affineDim = d - 1 ∧ #X + #(X + Y.erase 0) ≤ #(X + Y)) := by
+  obtain hdel | hdel := eq_or_ne ((X.erase 0 + Y.erase 0).affineDim) d
   · left
     refine ⟨hdel, ?_⟩
     grind [card_erase_add_erase_add_le h0X h0Y hposX hposY]
   right
-  have hlt : finsetAffineDim (X.erase 0 + Y.erase 0) < d := by
-    grind [finsetAffineDim_mono (add_subset_add (erase_subset 0 X) (erase_subset 0 Y))]
+  have hlt : (X.erase 0 + Y.erase 0).affineDim < d := by
+    grind [affineDim_mono (add_subset_add (erase_subset 0 X) (erase_subset 0 Y))]
   obtain ⟨x₀, hx₀⟩ : (X.erase 0).Nonempty := by
     rw [← card_pos, card_erase_of_mem h0X]
     grind
@@ -354,15 +354,15 @@ lemma geometric_deletion_cases (h0X : 0 ∈ X) (h0Y : 0 ∈ Y)
   · right
     right
     exact deletion_right_of_mem h0X h0Y hx₀ hy₀ hdim hlt hxU
-  obtain hcodim | hcodim : finsetAffineDim (X.erase 0 + Y.erase 0) + 1 = d ∨
-      finsetAffineDim (X.erase 0 + Y.erase 0) + 2 = d := by
-    grind [finsetAffineDim_add_le_add_two h0X h0Y hx₀ hy₀]
+  obtain hcodim | hcodim : (X.erase 0 + Y.erase 0).affineDim + 1 = d ∨
+      (X.erase 0 + Y.erase 0).affineDim + 2 = d := by
+    grind [affineDim_add_le_add_two h0X h0Y hx₀ hy₀]
   · left
     exact ⟨by grind, card_add_card_erase_add_erase_le hposX hposY h0X hx₀ hy₀ hxU⟩
   · right
     left
-    have hyW := notMem_sup_of_finsetAffineDim_eq h0X h0Y hx₀ hy₀ hdim hcodim
-    exact ⟨by grind [finsetAffineDim_erase_add_eq h0Y hx₀ hy₀ hyW],
+    have hyW := notMem_sup_of_affineDim_eq h0X h0Y hx₀ hy₀ hdim hcodim
+    exact ⟨by grind [affineDim_erase_add_eq h0Y hx₀ hy₀ hyW],
       card_add_card_erase_add_le hposX hposY h0X hx₀ hy₀ hxU hyW⟩
 
 end SumOfSetsInSeveralDimensions

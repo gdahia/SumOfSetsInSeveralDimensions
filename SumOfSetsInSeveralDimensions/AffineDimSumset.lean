@@ -18,44 +18,43 @@ sets are nonempty, and at least the affine dimension of `A ∪ B` minus one.
 
 ## Main statements
 
-* `finsetAffineDim_le_finsetAffineDim_add_right`, `finsetAffineDim_le_finsetAffineDim_add_left`:
-  the affine dimensions of `A` and `B` are at most that of `A + B`.
-* `finsetAffineDim_add_eq_of_left_eq`: if `A ⊆ ℝ^D` has affine dimension `D`, so has `A + B`.
-* `finsetAffineDim_union_le_sum_add_one`: the affine dimension of `A ∪ B` is at most that of
-  `A + B` plus one.
+* `Finset.affineDim_le_affineDim_add_right`, `Finset.affineDim_le_affineDim_add_left`: the
+  affine dimensions of `A` and `B` are at most that of `A + B`.
+* `Finset.affineDim_add_eq_of_left_eq`: if `A ⊆ ℝ^D` has affine dimension `D`, so has `A + B`.
+* `Finset.affineDim_union_le_sum_add_one`: the affine dimension of `A ∪ B` is at most that
+  of `A + B` plus one.
 -/
 
 public section
 
-namespace SumOfSetsInSeveralDimensions
+namespace Finset
 
-open Finset
 open scoped Pointwise
 
 variable {D : ℕ}
 
 /-- The affine dimension of `A` is at most that of `A + B` when `B` is nonempty. -/
-lemma finsetAffineDim_le_finsetAffineDim_add_right (A : Finset (Fin D → ℝ))
-    {B : Finset (Fin D → ℝ)} (hB : B.Nonempty) : finsetAffineDim A ≤ finsetAffineDim (A + B) := by
+lemma affineDim_le_affineDim_add_right (A : Finset (Fin D → ℝ))
+    {B : Finset (Fin D → ℝ)} (hB : B.Nonempty) : A.affineDim ≤ (A + B).affineDim := by
   obtain ⟨b, hb⟩ := hB
-  rw [← finsetAffineDim_image_add_right b A]
-  apply finsetAffineDim_mono
+  rw [← affineDim_image_add_right b A]
+  apply affineDim_mono
   rw [image_subset_iff]
   intro a ha
   exact add_mem_add ha hb
 
 /-- The affine dimension of `B` is at most that of `A + B` when `A` is nonempty. -/
-lemma finsetAffineDim_le_finsetAffineDim_add_left {A : Finset (Fin D → ℝ)} (hA : A.Nonempty)
-    (B : Finset (Fin D → ℝ)) : finsetAffineDim B ≤ finsetAffineDim (A + B) := by
+lemma affineDim_le_affineDim_add_left {A : Finset (Fin D → ℝ)} (hA : A.Nonempty)
+    (B : Finset (Fin D → ℝ)) : B.affineDim ≤ (A + B).affineDim := by
   rw [add_comm]
-  exact finsetAffineDim_le_finsetAffineDim_add_right B hA
+  exact affineDim_le_affineDim_add_right B hA
 
 /-- If `A ⊆ ℝ^D` has affine dimension `D` and `B` is nonempty, then `A + B` has affine
 dimension `D`. -/
-lemma finsetAffineDim_add_eq_of_left_eq {A B : Finset (Fin D → ℝ)} (hB : B.Nonempty)
-    (hA : finsetAffineDim A = D) : finsetAffineDim (A + B) = D :=
-  le_antisymm (finsetAffineDim_le _)
-    (hA.symm.trans_le (finsetAffineDim_le_finsetAffineDim_add_right A hB))
+lemma affineDim_add_eq_of_left_eq {A B : Finset (Fin D → ℝ)} (hB : B.Nonempty)
+    (hA : A.affineDim = D) : (A + B).affineDim = D :=
+  le_antisymm (affineDim_le _)
+    (hA.symm.trans_le (affineDim_le_affineDim_add_right A hB))
 
 private lemma vectorSpan_union_le {A B : Finset (Fin D → ℝ)} {a b : Fin D → ℝ} (ha : a ∈ A)
     (hb : b ∈ B) :
@@ -74,15 +73,15 @@ private lemma vectorSpan_union_le {A B : Finset (Fin D → ℝ)} {a b : Fin D �
       (mem_coe.2 (add_mem_add ha hb))
 
 /-- The affine span of `A ∪ B` has dimension at most one more than the affine span of `A + B`. -/
-lemma finsetAffineDim_union_le_sum_add_one {A B : Finset (Fin D → ℝ)}
+lemma affineDim_union_le_sum_add_one {A B : Finset (Fin D → ℝ)}
     (hA : A.Nonempty) (hB : B.Nonempty) :
-    finsetAffineDim (A ∪ B) ≤ finsetAffineDim (A + B) + 1 := by
+    (A ∪ B).affineDim ≤ (A + B).affineDim + 1 := by
   obtain ⟨a, ha⟩ := hA
   obtain ⟨b, hb⟩ := hB
-  rw [finsetAffineDim_eq_finrank_vectorSpan, finsetAffineDim_eq_finrank_vectorSpan]
+  rw [affineDim_eq_finrank_vectorSpan, affineDim_eq_finrank_vectorSpan]
   apply (Submodule.finrank_mono (vectorSpan_union_le ha hb)).trans
   apply (Submodule.finrank_add_le_finrank_add_finrank _ _).trans
   gcongr
   simpa using finrank_span_le_card ({b - a} : Set (Fin D → ℝ))
 
-end SumOfSetsInSeveralDimensions
+end Finset

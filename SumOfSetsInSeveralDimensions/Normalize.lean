@@ -91,7 +91,7 @@ lemma normalize_add_card {A B : Finset (Fin D → ℝ)} (hA : A.Nonempty) (hB : 
 
 /-- The sum of the translates of `A` and `B` has the affine dimension of `A + B`. -/
 lemma normalize_add_dim {A B : Finset (Fin D → ℝ)} (hA : A.Nonempty) (hB : B.Nonempty) :
-    finsetAffineDim (normalize A hA + normalize B hB) = finsetAffineDim (A + B) := by
-  rw [normalize_add, finsetAffineDim_image_sub]
+    (normalize A hA + normalize B hB).affineDim = (A + B).affineDim := by
+  rw [normalize_add, affineDim_image_sub]
 
 end SumOfSetsInSeveralDimensions

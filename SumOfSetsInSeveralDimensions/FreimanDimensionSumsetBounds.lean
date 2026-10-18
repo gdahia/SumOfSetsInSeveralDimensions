@@ -107,14 +107,14 @@ theorem card_add_sum_min_le_card_add_of_isAddFreimanIso {G : Type*} [DecidableEq
     [AddCommMonoid G] {r : ℕ} {A B : Finset G} {f : G → Fin r → ℝ} (hB : B.Nonempty)
     (hBA : #B ≤ #A)
     (hf : IsAddFreimanIso 2 ((A ∪ B : Finset G) : Set G) ((A ∪ B).image f : Set (Fin r → ℝ)) f)
-    (hdim : finsetAffineDim ((A ∪ B).image f) = r) :
+    (hdim : ((A ∪ B).image f).affineDim = r) :
     #A + ∑ t ∈ Icc 1 (#B - 1), min (r - 1) (#A - t) ≤ #(A + B) := by
   have hcard {S : Finset G} (hS : S ⊆ A ∪ B) : #(S.image f) = #S :=
     card_image_of_injOn (hf.bijOn.injOn.mono (coe_subset.2 hS))
   have hA : A.Nonempty := card_pos.1 (hB.card_pos.trans_le hBA)
   have h := card_add_sum_min_le_card_add_of_le (d := r - 1) (hB.image f)
     (by rwa [hcard subset_union_left, hcard subset_union_right])
-    (by grind [image_union, finsetAffineDim_union_le_sum_add_one (hA.image f) (hB.image f)])
+    (by grind [image_union, affineDim_union_le_sum_add_one (hA.image f) (hB.image f)])
   rwa [hcard subset_union_left, hcard subset_union_right,
     card_add_image_of_isAddFreimanIso hf subset_union_left subset_union_right] at h
 
@@ -128,7 +128,7 @@ theorem card_add_sum_min_le_card_add_of_isAddFreimanIso_of_finrank_span_sub_eq {
       (↑((A ∪ B).image f) - ↑((A ∪ B).image f) : Set (Fin r → ℝ))) = r) :
     #A + ∑ t ∈ Icc 1 (#B - 1), min (r - 1) (#A - t) ≤ #(A + B) :=
   card_add_sum_min_le_card_add_of_isAddFreimanIso hB hBA hf
-    ((finsetAffineDim_eq_finrank_span_sub _).trans hdim)
+    ((affineDim_eq_finrank_span_sub _).trans hdim)
 
 private lemma sub_one_mul_le_choose_add_choose (b r : ℕ) :
     (r - 1) * b ≤ b.choose 2 + (r + 1).choose 2 := by
@@ -175,11 +175,11 @@ theorem le_two_mul_sub_one_of_isAddFreimanIso {G : Type*} [DecidableEq G]
     [AddCancelCommMonoid G] {r : ℕ} {κ : ℝ} {X : Finset G} {f : G → Fin r → ℝ}
     (hX : X.Nonempty) (hXX : (#(X + X) : ℝ) ≤ κ * #X)
     (hf : IsAddFreimanIso 2 (X : Set G) (X.image f : Set (Fin r → ℝ)) f)
-    (hdim : finsetAffineDim (X.image f) = r) : (r : ℝ) ≤ 2 * κ - 1 := by
+    (hdim : (X.image f).affineDim = r) : (r : ℝ) ≤ 2 * κ - 1 := by
   obtain rfl | hr := r.eq_zero_or_pos
   · grind [one_le_of_card_add_le hX hXX]
   have hrX : r ≤ #X := by
-    grind [finsetAffineDim_add_one_le_card (hX.image f), card_image_of_injOn hf.bijOn.injOn]
+    grind [affineDim_add_one_le_card (hX.image f), card_image_of_injOn hf.bijOn.injOn]
   have h := card_add_sum_min_le_card_add_of_isAddFreimanIso hX le_rfl (by rwa [union_self])
     (by rwa [union_self])
   rw [sum_Icc_min_sub hr hrX] at h
@@ -195,7 +195,7 @@ theorem le_two_mul_sub_one_of_isAddFreimanIso_of_finrank_span_sub_eq {G : Type*}
       r) :
     (r : ℝ) ≤ 2 * κ - 1 :=
   le_two_mul_sub_one_of_isAddFreimanIso hX hXX hf
-    ((finsetAffineDim_eq_finrank_span_sub _).trans hdim)
+    ((affineDim_eq_finrank_span_sub _).trans hdim)
 
 lemma sub_mul_sub_choose_le_sum_min (b r : ℕ) :
     (r - 1) * b - (r + 1).choose 2 ≤ ∑ t ∈ Icc 1 (b - 1), min (r - 1) (b - t) := by

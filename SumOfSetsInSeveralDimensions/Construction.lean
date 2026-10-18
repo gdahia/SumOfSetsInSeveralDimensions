@@ -108,13 +108,13 @@ lemma axisPoints_add_axisPoints_subset (k l : ℕ) :
 
 /-- The set `axisUnionBasis e k e` contains `0`, `e₀` and all of `e₁, …, e_e`, so it has affine
 dimension `e + 1` when `k ≥ 1`. -/
-lemma finsetAffineDim_axisUnionBasis {k : ℕ} (hk : 1 ≤ k) :
-    finsetAffineDim (axisUnionBasis e k e) = e + 1 := by
+lemma affineDim_axisUnionBasis {k : ℕ} (hk : 1 ≤ k) :
+    (axisUnionBasis e k e).affineDim = e + 1 := by
   have h0 : (0 : Fin (e + 1) → ℝ) ∈ axisUnionBasis e k e :=
     mem_union_left _ (mem_image.2 ⟨0, by simp, by simp⟩)
   suffices h : Submodule.span ℝ
       ((· -ᵥ (0 : Fin (e + 1) → ℝ)) '' (axisUnionBasis e k e : Set (Fin (e + 1) → ℝ))) = ⊤ by
-    rw [finsetAffineDim_eq_finrank_vectorSpan, vectorSpan_eq_span_vsub_set_right ℝ (mem_coe.2 h0),
+    rw [affineDim_eq_finrank_vectorSpan, vectorSpan_eq_span_vsub_set_right ℝ (mem_coe.2 h0),
       h, finrank_top, Module.finrank_fin_fun]
   rw [eq_top_iff, ← (Pi.basisFun ℝ (Fin (e + 1))).span_eq, Submodule.span_le]
   rintro _ ⟨i, rfl⟩
@@ -181,12 +181,12 @@ private lemma two_mul_choose_two_add_one (c : ℕ) : 2 * (c + 1).choose 2 = (c +
 
 /-- The construction when `t = n - m ≥ e`: `A = {0, e₀, …, (m - 1) e₀}`. -/
 private lemma exists_card_add_le_of_le {m n : ℕ} (hm : 1 ≤ m) (hn : e + 2 ≤ n) (hmn : m + e ≤ n) :
-    ∃ A B : Finset (Fin (e + 1) → ℝ), #A = m ∧ #B = n ∧ finsetAffineDim B = e + 1 ∧
+    ∃ A B : Finset (Fin (e + 1) → ℝ), #A = m ∧ #B = n ∧ B.affineDim = e + 1 ∧
       #(A + B) ≤ sumsetCardLowerBound (e + 1) m n := by
   obtain ⟨a, rfl⟩ := Nat.exists_eq_add_of_le' hm
   obtain ⟨r, rfl⟩ := Nat.exists_eq_add_of_le hmn
   refine ⟨axisUnionBasis e a 0, axisUnionBasis e (a + r) e, by simp [card_axisUnionBasis],
-    by rw [card_axisUnionBasis _ le_rfl]; grind, finsetAffineDim_axisUnionBasis (by grind), ?_⟩
+    by rw [card_axisUnionBasis _ le_rfl]; grind, affineDim_axisUnionBasis (by grind), ?_⟩
   rw [sumsetCardLowerBound_of_add_le (by grind), Nat.add_sub_cancel]
   grind [card_axisUnionBasis_add_le (e := e) (p := a + r) (q := a) (Or.inl rfl) (Nat.zero_le e),
     Nat.choose_eq_zero_of_lt (by grind : 0 + 1 < 2)]
@@ -194,14 +194,14 @@ private lemma exists_card_add_le_of_le {m n : ℕ} (hm : 1 ≤ m) (hn : e + 2 �
 /-- The construction when `t = n - m < e`: with `c = e - t`, `A = {0, …, p e₀} ∪ {e₁, …, e_c}`
 and `B = {0, …, p e₀} ∪ {e₁, …, e_e}` for `p = n - 1 - e`. -/
 private lemma exists_card_add_le_of_lt {m n : ℕ} (hmn : m ≤ n) (hn : e + 2 ≤ n) (hnm : n < m + e) :
-    ∃ A B : Finset (Fin (e + 1) → ℝ), #A = m ∧ #B = n ∧ finsetAffineDim B = e + 1 ∧
+    ∃ A B : Finset (Fin (e + 1) → ℝ), #A = m ∧ #B = n ∧ B.affineDim = e + 1 ∧
       #(A + B) ≤ sumsetCardLowerBound (e + 1) m n := by
   obtain ⟨t, rfl⟩ := Nat.exists_eq_add_of_le hmn
   obtain ⟨c, rfl⟩ := Nat.exists_eq_add_of_lt (by grind : t < e)
   obtain ⟨p, rfl⟩ := Nat.exists_eq_add_of_le (by grind : c + 2 ≤ m)
   refine ⟨axisUnionBasis (t + c + 1) p (c + 1), axisUnionBasis (t + c + 1) p (t + c + 1),
     by rw [card_axisUnionBasis _ (by grind)]; grind,
-    by rw [card_axisUnionBasis _ le_rfl]; grind, finsetAffineDim_axisUnionBasis (by grind), ?_⟩
+    by rw [card_axisUnionBasis _ le_rfl]; grind, affineDim_axisUnionBasis (by grind), ?_⟩
   have h := two_mul_sumsetCardLowerBound_add_add (d := t + c + 1 + 1) (m := c + 2 + p)
     (n := c + 2 + p + t) (by grind) (by grind) (by grind)
   rw [Nat.add_sub_cancel_left] at h
@@ -213,7 +213,7 @@ private lemma exists_card_add_le_of_lt {m n : ℕ} (hmn : m ≤ n) (hn : e + 2 �
 of affine dimension `e + 1` and `|A + B| ≤ G_(e + 1)(m, n)`. -/
 lemma exists_card_add_le_sumsetCardLowerBound {m n : ℕ} (hm : 1 ≤ m) (hmn : m ≤ n)
     (hn : e + 2 ≤ n) :
-    ∃ A B : Finset (Fin (e + 1) → ℝ), #A = m ∧ #B = n ∧ finsetAffineDim B = e + 1 ∧
+    ∃ A B : Finset (Fin (e + 1) → ℝ), #A = m ∧ #B = n ∧ B.affineDim = e + 1 ∧
       #(A + B) ≤ sumsetCardLowerBound (e + 1) m n := by
   obtain hmn' | hnm := le_or_gt (m + e) n
   · exact exists_card_add_le_of_le hm hn hmn'
@@ -224,14 +224,14 @@ with `|A| = m`, `|B| = n`, `B` of affine dimension `d` and
 `|A + B| = n + ∑ j ∈ {1, …, m - 1}, min d (n - j)`. -/
 theorem exists_card_add_eq_sumsetCardLowerBound {d m n : ℕ} (hd : 1 ≤ d) (hm : 1 ≤ m)
     (hmn : m ≤ n) (hn : d + 1 ≤ n) :
-    ∃ A B : Finset (Fin d → ℝ), #A = m ∧ #B = n ∧ finsetAffineDim B = d ∧
+    ∃ A B : Finset (Fin d → ℝ), #A = m ∧ #B = n ∧ B.affineDim = d ∧
       #(A + B) = sumsetCardLowerBound d m n := by
   obtain ⟨e, rfl⟩ := Nat.exists_eq_add_of_le' hd
   obtain ⟨A, B, hA, hB, hBdim, hAB⟩ := exists_card_add_le_sumsetCardLowerBound hm hmn hn
   refine ⟨A, B, hA, hB, hBdim, le_antisymm hAB ?_⟩
   have hA' : A.Nonempty := card_pos.1 (by grind)
   have h := card_add_sum_min_le_card_add (A := B) (B := A) hA' (by grind)
-    (finsetAffineDim_add_eq_of_left_eq hA' hBdim)
+    (affineDim_add_eq_of_left_eq hA' hBdim)
   rwa [add_comm B, hA, hB, ← sumsetCardLowerBound_eq] at h
 
 end SumOfSetsInSeveralDimensions

@@ -13,7 +13,8 @@ public import SumOfSetsInSeveralDimensions.AffineDim
 
 The Freiman dimension of a finite subset `X` of an abelian group is the largest `d ≤ |X|` such that
 `X` is Freiman isomorphic of order `2` to a subset of `ℚ^d` that is not contained in a proper
-affine subspace. The affine dimension of the image is `finsetAffineDim` of its inclusion in `ℝ^d`.
+affine subspace. The affine dimension of the image is the `Finset.affineDim` of its inclusion in
+`ℝ^d`.
 
 ## Main definitions
 
@@ -39,7 +40,7 @@ def rationalVectorToReal {d : ℕ} (v : Fin d → ℚ) : Fin d → ℝ := fun i 
 from `X` onto a subset of `ℚ^d` of affine dimension `d`. -/
 def freimanModelDim {G : Type*} [DecidableEq G] [AddCommMonoid G] (X : Finset G) (d : ℕ) : Prop :=
   ∃ f : G → (Fin d → ℚ), IsAddFreimanIso 2 (X : Set G) (X.image f : Set (Fin d → ℚ)) f ∧
-    finsetAffineDim ((X.image f).image rationalVectorToReal) = d
+    ((X.image f).image rationalVectorToReal).affineDim = d
 
 /-- The Freiman dimension of `X`: the largest `d ≤ |X|` such that `X` has a Freiman model of
 dimension `d`. -/

@@ -20,102 +20,99 @@ the differences of the points of `S`.
 
 ## Main definitions
 
-* `finsetAffineDim S`: the affine dimension of `S`.
+* `Finset.affineDim S`: the affine dimension of `S`.
 
 ## Main statements
 
-* `finsetAffineDim_eq_finrank_vectorSpan`: `finsetAffineDim S` is the dimension of
-  `vectorSpan ℝ S`.
-* `finsetAffineDim_eq_finrank_span_sub`: `finsetAffineDim S` is the dimension of the span of
-  `S - S`.
-* `finsetAffineDim_mono`: the affine dimension is monotone.
-* `finsetAffineDim_vadd_finset`, `finsetAffineDim_image_add_left`,
-  `finsetAffineDim_image_add_right`, `finsetAffineDim_image_sub`: it is invariant under
+* `Finset.affineDim_eq_finrank_vectorSpan`: `S.affineDim` is the dimension of `vectorSpan ℝ S`.
+* `Finset.affineDim_eq_finrank_span_sub`: `S.affineDim` is the dimension of the span of `S - S`.
+* `Finset.affineDim_mono`: the affine dimension is monotone.
+* `Finset.affineDim_vadd_finset`, `Finset.affineDim_image_add_left`,
+  `Finset.affineDim_image_add_right`, `Finset.affineDim_image_sub`: it is invariant under
   translation.
-* `finsetAffineDim_add_one_le_card`: a nonempty set of affine dimension `d` has at least `d + 1`
+* `Finset.affineDim_add_one_le_card`: a nonempty set of affine dimension `d` has at least `d + 1`
   points.
 -/
 
 @[expose] public section
 
-namespace SumOfSetsInSeveralDimensions
+namespace Finset
 
-open Finset
 open scoped Pointwise
 
 variable {D : ℕ}
 
 /-- The affine dimension of a finite set `S ⊆ ℝ^D`: the dimension of the direction of the affine
 span of `S`. -/
-noncomputable def finsetAffineDim (S : Finset (Fin D → ℝ)) : ℕ :=
+noncomputable def affineDim (S : Finset (Fin D → ℝ)) : ℕ :=
   Module.finrank ℝ (affineSpan ℝ (S : Set (Fin D → ℝ))).direction
 
 /-- The affine dimension of `S` is the dimension of the vector span of `S`. -/
-lemma finsetAffineDim_eq_finrank_vectorSpan (S : Finset (Fin D → ℝ)) :
-    finsetAffineDim S = Module.finrank ℝ (vectorSpan ℝ (S : Set (Fin D → ℝ))) := by
-  rw [finsetAffineDim, direction_affineSpan]
+lemma affineDim_eq_finrank_vectorSpan (S : Finset (Fin D → ℝ)) :
+    S.affineDim = Module.finrank ℝ (vectorSpan ℝ (S : Set (Fin D → ℝ))) := by
+  rw [affineDim, direction_affineSpan]
 
 /-- The affine dimension of `S` is the dimension of the span of `S - S`. -/
-lemma finsetAffineDim_eq_finrank_span_sub (S : Finset (Fin D → ℝ)) :
-    finsetAffineDim S = Module.finrank ℝ (Submodule.span ℝ (↑S - ↑S : Set (Fin D → ℝ))) := by
-  rw [finsetAffineDim_eq_finrank_vectorSpan, vectorSpan_def]
+lemma affineDim_eq_finrank_span_sub (S : Finset (Fin D → ℝ)) :
+    S.affineDim = Module.finrank ℝ (Submodule.span ℝ (↑S - ↑S : Set (Fin D → ℝ))) := by
+  rw [affineDim_eq_finrank_vectorSpan, vectorSpan_def]
   rfl
 
 /-- Affine dimension is monotone under inclusion of finite sets. -/
-lemma finsetAffineDim_mono {S T : Finset (Fin D → ℝ)}
-    (hST : S ⊆ T) : finsetAffineDim S ≤ finsetAffineDim T := by
-  unfold finsetAffineDim
+lemma affineDim_mono {S T : Finset (Fin D → ℝ)}
+    (hST : S ⊆ T) : S.affineDim ≤ T.affineDim := by
+  unfold affineDim
   apply Submodule.finrank_mono
   apply AffineSubspace.direction_le
   apply affineSpan_mono
   simpa using hST
 
 /-- The affine dimension of a subset of `ℝ^D` is at most `D`. -/
-lemma finsetAffineDim_le (S : Finset (Fin D → ℝ)) : finsetAffineDim S ≤ D :=
+lemma affineDim_le (S : Finset (Fin D → ℝ)) : S.affineDim ≤ D :=
   (Submodule.finrank_le _).trans_eq (Module.finrank_fin_fun ℝ)
 
 @[simp]
-lemma finsetAffineDim_empty : finsetAffineDim (∅ : Finset (Fin D → ℝ)) = 0 := by
-  simp [finsetAffineDim_eq_finrank_vectorSpan]
+lemma affineDim_empty : (∅ : Finset (Fin D → ℝ)).affineDim = 0 := by
+  simp [affineDim_eq_finrank_vectorSpan]
 
 @[simp]
-lemma finsetAffineDim_singleton (x : Fin D → ℝ) : finsetAffineDim {x} = 0 := by
-  simp [finsetAffineDim_eq_finrank_vectorSpan]
+lemma affineDim_singleton (x : Fin D → ℝ) : ({x} : Finset (Fin D → ℝ)).affineDim = 0 := by
+  simp [affineDim_eq_finrank_vectorSpan]
 
 /-- The affine dimension is invariant under translation. -/
 @[simp]
-lemma finsetAffineDim_vadd_finset (c : Fin D → ℝ) (S : Finset (Fin D → ℝ)) :
-    finsetAffineDim (c +ᵥ S) = finsetAffineDim S := by
-  rw [finsetAffineDim_eq_finrank_vectorSpan, coe_vadd_finset, vectorSpan_vadd,
-    finsetAffineDim_eq_finrank_vectorSpan]
+lemma affineDim_vadd_finset (c : Fin D → ℝ) (S : Finset (Fin D → ℝ)) :
+    (c +ᵥ S).affineDim = S.affineDim := by
+  rw [affineDim_eq_finrank_vectorSpan, coe_vadd_finset, vectorSpan_vadd,
+    affineDim_eq_finrank_vectorSpan]
 
 /-- The affine dimension of `c + S` is that of `S`. -/
-lemma finsetAffineDim_image_add_left (c : Fin D → ℝ) (S : Finset (Fin D → ℝ)) :
-    finsetAffineDim (S.image (c + ·)) = finsetAffineDim S :=
-  finsetAffineDim_vadd_finset c S
+lemma affineDim_image_add_left (c : Fin D → ℝ) (S : Finset (Fin D → ℝ)) :
+    (S.image (c + ·)).affineDim = S.affineDim :=
+  affineDim_vadd_finset c S
 
 /-- The affine dimension of `S + c` is that of `S`. -/
-lemma finsetAffineDim_image_add_right (c : Fin D → ℝ) (S : Finset (Fin D → ℝ)) :
-    finsetAffineDim (S.image (· + c)) = finsetAffineDim S := by
-  simp only [add_comm _ c, finsetAffineDim_image_add_left]
+lemma affineDim_image_add_right (c : Fin D → ℝ) (S : Finset (Fin D → ℝ)) :
+    (S.image (· + c)).affineDim = S.affineDim := by
+  simp only [add_comm _ c, affineDim_image_add_left]
 
 /-- The affine dimension of `S - c` is that of `S`. -/
-lemma finsetAffineDim_image_sub (S : Finset (Fin D → ℝ)) (c : Fin D → ℝ) :
-    finsetAffineDim (S.image fun x ↦ x - c) = finsetAffineDim S := by
-  simp only [sub_eq_add_neg, finsetAffineDim_image_add_right]
+lemma affineDim_image_sub (S : Finset (Fin D → ℝ)) (c : Fin D → ℝ) :
+    (S.image fun x ↦ x - c).affineDim = S.affineDim := by
+  simp only [sub_eq_add_neg, affineDim_image_add_right]
 
 /-- A nonempty finite set of affine dimension `d` contains at least `d + 1` points. -/
-lemma finsetAffineDim_add_one_le_card {S : Finset (Fin D → ℝ)} (hS : S.Nonempty) :
-    finsetAffineDim S + 1 ≤ #S := by
+lemma affineDim_add_one_le_card {S : Finset (Fin D → ℝ)} (hS : S.Nonempty) :
+    S.affineDim + 1 ≤ #S := by
   have : Nonempty (S : Set (Fin D → ℝ)) := hS.to_set.to_subtype
   have h := finrank_vectorSpan_range_add_one_le ℝ ((↑) : ↥(S : Set (Fin D → ℝ)) → Fin D → ℝ)
-  rw [Subtype.range_coe, ← finsetAffineDim_eq_finrank_vectorSpan] at h
+  rw [Subtype.range_coe, ← affineDim_eq_finrank_vectorSpan] at h
   simpa using h
 
 /-- The affine dimension of a finite set is at most its number of points. -/
-lemma finsetAffineDim_le_card (S : Finset (Fin D → ℝ)) : finsetAffineDim S ≤ #S := by
+lemma affineDim_le_card (S : Finset (Fin D → ℝ)) : S.affineDim ≤ #S := by
   obtain rfl | hS := S.eq_empty_or_nonempty
   · simp
-  · grind [finsetAffineDim_add_one_le_card hS]
+  · grind [affineDim_add_one_le_card hS]
 
-end SumOfSetsInSeveralDimensions
+end Finset

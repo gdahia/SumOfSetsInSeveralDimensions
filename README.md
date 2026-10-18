@@ -59,7 +59,7 @@ depend on no axioms other than `propext`, `Classical.choice` and `Quot.sound`.
 
 | Declaration | Statement |
 | --- | --- |
-| `finsetAffineDim S` | `Module.finrank ℝ (affineSpan ℝ ↑S).direction` |
+| `Finset.affineDim S` | `Module.finrank ℝ (affineSpan ℝ ↑S).direction` |
 | `minCardAdd_eq_sumsetCardLowerBound`, `minCardAddOfDimRight_eq_sumsetCardLowerBound` | Theorem 2, with the minima `F_d` and `F'_d` of the paper as definitions |
 | `freimanDim X` | The Freiman dimension of a finite subset `X` of a commutative monoid |
 | `card_add_sum_min_le_of_freimanDim_union` | Theorem 1 for `B` nonempty, `\|B\| ≤ \|A\|` and `freimanDim (A ∪ B) = r ≥ 1`, with `r - 1` in place of `d` |

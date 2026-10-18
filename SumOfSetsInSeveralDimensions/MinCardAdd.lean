@@ -47,18 +47,18 @@ open scoped Pointwise
 /-- `F_d(m, n)`: the least size of `A + B` for `A, B ⊆ ℝ^d` with `|A| = m`, `|B| = n` and `A + B`
 of affine dimension `d`. -/
 noncomputable def minCardAdd (d m n : ℕ) : ℕ :=
-  sInf {k | ∃ A B : Finset (Fin d → ℝ), #A = m ∧ #B = n ∧ finsetAffineDim (A + B) = d ∧
+  sInf {k | ∃ A B : Finset (Fin d → ℝ), #A = m ∧ #B = n ∧ (A + B).affineDim = d ∧
     #(A + B) = k}
 
 /-- `F'_d(m, n)`: the least size of `A + B` for `A, B ⊆ ℝ^d` with `|A| = m`, `|B| = n` and `B`
 of affine dimension `d`. -/
 noncomputable def minCardAddOfDimRight (d m n : ℕ) : ℕ :=
-  sInf {k | ∃ A B : Finset (Fin d → ℝ), #A = m ∧ #B = n ∧ finsetAffineDim B = d ∧ #(A + B) = k}
+  sInf {k | ∃ A B : Finset (Fin d → ℝ), #A = m ∧ #B = n ∧ B.affineDim = d ∧ #(A + B) = k}
 
 variable {d m n : ℕ}
 
 private lemma sumsetCardLowerBound_le_card_add {A B : Finset (Fin d → ℝ)} (hm : 1 ≤ m)
-    (hmn : m ≤ n) (hA : #A = m) (hB : #B = n) (hdim : finsetAffineDim (A + B) = d) :
+    (hmn : m ≤ n) (hA : #A = m) (hB : #B = n) (hdim : (A + B).affineDim = d) :
     sumsetCardLowerBound d m n ≤ #(A + B) := by
   have h := card_add_sum_min_le_card_add (d := d) (A := B) (B := A) (card_pos.1 (by grind))
     (by grind) (by rwa [add_comm])
@@ -69,9 +69,9 @@ private lemma sumsetCardLowerBound_le_card_add {A B : Finset (Fin d → ℝ)} (h
 theorem minCardAdd_eq_sumsetCardLowerBound (hd : 1 ≤ d) (hm : 1 ≤ m) (hmn : m ≤ n)
     (hn : d + 1 ≤ n) : minCardAdd d m n = sumsetCardLowerBound d m n := by
   obtain ⟨A, B, hA, hB, hBdim, hAB⟩ := exists_card_add_eq_sumsetCardLowerBound hd hm hmn hn
-  have hdim : finsetAffineDim (A + B) = d := by
+  have hdim : (A + B).affineDim = d := by
     rw [add_comm]
-    exact finsetAffineDim_add_eq_of_left_eq (card_pos.1 (by grind)) hBdim
+    exact affineDim_add_eq_of_left_eq (card_pos.1 (by grind)) hBdim
   refine le_antisymm (Nat.sInf_le ⟨A, B, hA, hB, hdim, hAB⟩)
     (le_csInf ⟨_, A, B, hA, hB, hdim, rfl⟩ ?_)
   rintro k ⟨A', B', hA', hB', hdim', rfl⟩
@@ -87,7 +87,7 @@ theorem minCardAddOfDimRight_eq_sumsetCardLowerBound (hd : 1 ≤ d) (hm : 1 ≤ 
   rintro k ⟨A', B', hA', hB', hBdim', rfl⟩
   refine sumsetCardLowerBound_le_card_add hm hmn hA' hB' ?_
   rw [add_comm]
-  exact finsetAffineDim_add_eq_of_left_eq (card_pos.1 (by grind)) hBdim'
+  exact affineDim_add_eq_of_left_eq (card_pos.1 (by grind)) hBdim'
 
 /-- Theorem 2 of Ruzsa for `F_d`, with `F_d` and `G_d` unfolded and the affine dimension of
 `A + B` written as the dimension of the span of `(A + B) - (A + B)`. -/
@@ -95,7 +95,7 @@ theorem sInf_card_add_eq_add_sum_min (hd : 1 ≤ d) (hm : 1 ≤ m) (hmn : m ≤ 
     sInf {k | ∃ A B : Finset (Fin d → ℝ), #A = m ∧ #B = n ∧
       Module.finrank ℝ (Submodule.span ℝ (↑(A + B) - ↑(A + B) : Set (Fin d → ℝ))) = d ∧
       #(A + B) = k} = n + ∑ j ∈ Icc 1 (m - 1), min d (n - j) := by
-  simp_rw [← finsetAffineDim_eq_finrank_span_sub, ← sumsetCardLowerBound_eq]
+  simp_rw [← affineDim_eq_finrank_span_sub, ← sumsetCardLowerBound_eq]
   exact minCardAdd_eq_sumsetCardLowerBound hd hm hmn hn
 
 /-- Theorem 2 of Ruzsa for `F'_d`, with `F'_d` and `G_d` unfolded and the affine dimension of `B`
@@ -105,7 +105,7 @@ theorem sInf_card_add_of_finrank_span_sub_right_eq_add_sum_min (hd : 1 ≤ d) (h
     sInf {k | ∃ A B : Finset (Fin d → ℝ), #A = m ∧ #B = n ∧
       Module.finrank ℝ (Submodule.span ℝ (↑B - ↑B : Set (Fin d → ℝ))) = d ∧ #(A + B) = k} =
       n + ∑ j ∈ Icc 1 (m - 1), min d (n - j) := by
-  simp_rw [← finsetAffineDim_eq_finrank_span_sub, ← sumsetCardLowerBound_eq]
+  simp_rw [← affineDim_eq_finrank_span_sub, ← sumsetCardLowerBound_eq]
   exact minCardAddOfDimRight_eq_sumsetCardLowerBound hd hm hmn hn
 
 end SumOfSetsInSeveralDimensions

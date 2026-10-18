@@ -46,10 +46,10 @@ open scoped Pointwise
 lexicographically positive, given the bound for all pairs of sets with fewer points. -/
 private lemma sumsetCardLowerBound_le_card_add_of_zero_mem {D d : ℕ} {X Y : Finset (Fin D → ℝ)}
     (ih : ∀ {e : ℕ} {A B : Finset (Fin D → ℝ)}, #A + #B < #Y + #X → B.Nonempty → #B ≤ #A →
-      finsetAffineDim (A + B) = e → sumsetCardLowerBound e #B #A ≤ #(A + B))
+      (A + B).affineDim = e → sumsetCardLowerBound e #B #A ≤ #(A + B))
     (h0X : 0 ∈ X) (h0Y : 0 ∈ Y) (hposX : ∀ x ∈ X, x ≠ 0 → 0 < toLex x)
     (hposY : ∀ y ∈ Y, y ≠ 0 → 0 < toLex y) (hX : 2 ≤ #X) (hXY : #X ≤ #Y)
-    (hdim : finsetAffineDim (X + Y) = d) :
+    (hdim : (X + Y).affineDim = d) :
     sumsetCardLowerBound d #X #Y ≤ #(X + Y) := by
   have hX' : (X.erase 0).Nonempty := by
     rw [← card_pos, card_erase_of_mem h0X]
@@ -82,7 +82,7 @@ private lemma sumsetCardLowerBound_le_card_add_of_zero_mem {D d : ℕ} {X Y : Fi
       exact sumsetCardLowerBound_of_strict_right_case (by grind) hXY hrec hcard
 
 private lemma sumsetCardLowerBound_le_card_add {D d : ℕ} {A B : Finset (Fin D → ℝ)}
-    (hB : B.Nonempty) (hBA : #B ≤ #A) (hdim : finsetAffineDim (A + B) = d) :
+    (hB : B.Nonempty) (hBA : #B ≤ #A) (hdim : (A + B).affineDim = d) :
     sumsetCardLowerBound d #B #A ≤ #(A + B) := by
   generalize hn : #A + #B = n
   induction n using Nat.strong_induction_on generalizing d A B with
@@ -102,14 +102,14 @@ private lemma sumsetCardLowerBound_le_card_add {D d : ℕ} {A B : Finset (Fin D 
 /-- **Ruzsa's theorem.** If `A, B ⊆ ℝ^D` are finite, `B` is nonempty, `|B| ≤ |A|` and `A + B` has
 affine dimension `d`, then `|A| + ∑ t ∈ {1, …, |B| - 1}, min d (|A| - t) ≤ |A + B|`. -/
 theorem card_add_sum_min_le_card_add {D d : ℕ} {A B : Finset (Fin D → ℝ)}
-    (hB : B.Nonempty) (hBA : #B ≤ #A) (hdim : finsetAffineDim (A + B) = d) :
+    (hB : B.Nonempty) (hBA : #B ≤ #A) (hdim : (A + B).affineDim = d) :
     #A + ∑ t ∈ Icc 1 (#B - 1), min d (#A - t) ≤ #(A + B) := by
   rw [← sumsetCardLowerBound_eq]
   exact sumsetCardLowerBound_le_card_add hB hBA hdim
 
 /-- Ruzsa's theorem for every `d` at most the affine dimension of `A + B`. -/
 lemma card_add_sum_min_le_card_add_of_le {D d : ℕ} {A B : Finset (Fin D → ℝ)}
-    (hB : B.Nonempty) (hBA : #B ≤ #A) (hd : d ≤ finsetAffineDim (A + B)) :
+    (hB : B.Nonempty) (hBA : #B ≤ #A) (hd : d ≤ (A + B).affineDim) :
     #A + ∑ t ∈ Icc 1 (#B - 1), min d (#A - t) ≤ #(A + B) := by
   refine le_trans ?_ (card_add_sum_min_le_card_add hB hBA rfl)
   gcongr
@@ -120,6 +120,6 @@ theorem card_add_sum_min_le_card_add_of_finrank_span_sub_eq {D d : ℕ}
     {A B : Finset (Fin D → ℝ)} (hB : B.Nonempty) (hBA : #B ≤ #A)
     (hdim : Module.finrank ℝ (Submodule.span ℝ (↑(A + B) - ↑(A + B) : Set (Fin D → ℝ))) = d) :
     #A + ∑ t ∈ Icc 1 (#B - 1), min d (#A - t) ≤ #(A + B) :=
-  card_add_sum_min_le_card_add hB hBA ((finsetAffineDim_eq_finrank_span_sub _).trans hdim)
+  card_add_sum_min_le_card_add hB hBA ((affineDim_eq_finrank_span_sub _).trans hdim)
 
 end SumOfSetsInSeveralDimensions

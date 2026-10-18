@@ -71,7 +71,7 @@ variable {D d : ℕ} {A B : Finset (Fin D → ℝ)}
 /-- The closed form of Ruzsa's bound, multiplied by two: `2 * (|A| + d * |B|)` is at most
 `2 * |A + B| + d * (d + 1)`. -/
 lemma two_mul_card_add_mul_card_le (hB : B.Nonempty) (hBA : #B ≤ #A)
-    (hd : d ≤ finsetAffineDim (A + B)) : 2 * (#A + d * #B) ≤ 2 * #(A + B) + d * (d + 1) := by
+    (hd : d ≤ (A + B).affineDim) : 2 * (#A + d * #B) ≤ 2 * #(A + B) + d * (d + 1) := by
   grind [card_add_sum_min_le_card_add_of_le hB hBA hd,
     two_mul_mul_le_two_mul_sum_min_add d hB.card_pos hBA]
 
@@ -79,7 +79,7 @@ lemma two_mul_card_add_mul_card_le (hB : B.Nonempty) (hBA : #B ≤ #A)
 `|B| ≤ |A|` and `A + B` has affine dimension at least `d`, then
 `|A| + d * |B| ≤ |A + B| + d * (d + 1) / 2`. -/
 theorem card_add_mul_card_le_card_add_add (hB : B.Nonempty) (hBA : #B ≤ #A)
-    (hd : d ≤ finsetAffineDim (A + B)) :
+    (hd : d ≤ (A + B).affineDim) :
     #A + d * #B ≤ #(A + B) + d * (d + 1) / 2 := by
   grind [two_mul_card_add_mul_card_le hB hBA hd]
 
@@ -90,11 +90,11 @@ theorem card_add_mul_card_le_card_add_add_of_le_finrank_span_sub (hB : B.Nonempt
     (hd : d ≤ Module.finrank ℝ (Submodule.span ℝ (↑(A + B) - ↑(A + B) : Set (Fin D → ℝ)))) :
     #A + d * #B ≤ #(A + B) + d * (d + 1) / 2 :=
   card_add_mul_card_le_card_add_add hB hBA
-    (hd.trans_eq (finsetAffineDim_eq_finrank_span_sub _).symm)
+    (hd.trans_eq (affineDim_eq_finrank_span_sub _).symm)
 
 /-- The asymmetric form of Freiman's lemma in `ℝ`: `|A| + d * |B| - d * (d + 1) / 2 ≤ |A + B|`. -/
 lemma card_add_mul_card_sub_le_card_add (hB : B.Nonempty) (hBA : #B ≤ #A)
-    (hd : d ≤ finsetAffineDim (A + B)) :
+    (hd : d ≤ (A + B).affineDim) :
     (#A : ℝ) + d * #B - d * (d + 1) / 2 ≤ #(A + B) := by
   have h : (2 * (#A + d * #B) : ℝ) ≤ 2 * #(A + B) + d * (d + 1) :=
     mod_cast two_mul_card_add_mul_card_le hB hBA hd
@@ -102,7 +102,7 @@ lemma card_add_mul_card_sub_le_card_add (hB : B.Nonempty) (hBA : #B ≤ #A)
 
 /-- The asymmetric form of Freiman's lemma without an assumption on which set is larger. -/
 lemma max_card_add_mul_min_card_le_card_add_add (hA : A.Nonempty) (hB : B.Nonempty)
-    (hd : d ≤ finsetAffineDim (A + B)) :
+    (hd : d ≤ (A + B).affineDim) :
     max #A #B + d * min #A #B ≤ #(A + B) + d * (d + 1) / 2 := by
   rcases le_total #B #A with h | h
   · rw [max_eq_left h, min_eq_right h]
