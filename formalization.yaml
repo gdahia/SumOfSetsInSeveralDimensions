@@ -6,12 +6,11 @@ project:
   description: >-
     Lean 4 formalization of Ruzsa's lower bound for sumsets in ℝ^D: if A and B are finite
     sets with B nonempty and |B| ≤ |A|, and A + B has affine dimension d, then
-    |A + B| ≥ |A| + Σ_{t=1}^{|B|-1} min(d, |A| - t). The bound is attained: for d ≥ 1,
-    1 ≤ m ≤ n and n ≥ d + 1 it is the least size of A + B over sets A, B ⊆ ℝ^d of sizes m
-    and n with A + B, or B, of affine dimension d. The closed form
+    |A + B| ≥ |A| + Σ_{t=1}^{|B|-1} min(d, |A| - t). For d ≥ 1 and |A| ≥ d + 1
+    the bound is attained in ℝ^d. The closed form
     |A + B| ≥ |A| + d|B| - d(d+1)/2, the asymmetric form of Freiman's lemma, is derived from
-    the bound, and so is the bound 2κ - 1 for the Freiman dimension of a set X with
-    |X + X| ≤ κ|X|.
+    the bound, and so is the bound 2κ - 1, for a real κ, on the Freiman dimension of a set X
+    with |X + X| ≤ κ|X|.
   authors:
     - name: "Gabriel Dahia"
       github: "gdahia"
@@ -55,10 +54,10 @@ status:
     set: its expression as the rank of the vector span, monotonicity, invariance under
     translation, and bounds for the dimension of a sumset by those of the summands and of the
     union. The library also defines the Freiman dimension of a finite subset of a
-    commutative monoid, deduces Theorem 1 for sets of given Freiman dimension, and bounds the
-    Freiman dimension of X by 2κ - 1 when |X + X| ≤ κ|X|. The sorry counts refer to the
-    library and Solution.lean; Challenge.lean has one placeholder for each of its four
-    statements.
+    commutative monoid, deduces Theorem 1 for sets with a Freiman model in ℝ^r and for sets of
+    given Freiman dimension, and bounds r, and the Freiman dimension of X, by 2κ - 1 when
+    |X + X| ≤ κ|X|. The sorry counts refer to the library and Solution.lean; Challenge.lean has
+    one placeholder for each of its six statements.
   sorry_count: 0
   sorry_in_definitions: 0
   axioms: ["propext", "Classical.choice", "Quot.sound"]
@@ -77,8 +76,9 @@ automation:
         A first instruction to formalize Ruzsa's theorem, with the closed form and the lemmas
         that relate the affine dimension to the vector span. Later instructions to restyle
         the statements and proofs after Gabriel Dahia's review of other repositories, to
-        bring back the Freiman dimension, and to formalize the remaining results of the
-        paper from a copy of it.
+        bring back the Freiman dimension, to formalize the remaining results of the paper
+        from a copy of it, and to state the Freiman dimension results in Challenge.lean with
+        a real κ.
     - method: "agent"
       models: ["gpt-5.6 sol high", "claude opus 5"]
       framework: "Codex"
@@ -124,7 +124,16 @@ fidelity:
     and is the one proved here. The set A is {0, e₁, …, (m - k) e₁} ∪ {e₂, …, e_k} with
     k = max(1, d - (n - m)), which for n - m ≥ d is the set {0, …, (m - 1) e₁} of the paper.
 
-    The Freiman dimension and its bound by the doubling are not in the paper.
+    The Freiman dimension and its bound by the doubling are not in the paper. A Freiman model
+    of a finite set X in a commutative monoid is a Freiman isomorphism of order 2 from X onto a
+    set in ℝ^r of affine dimension r, and the Freiman dimension of X is the largest r ≤ |X| for
+    which X has a model in ℚ^r. Challenge.lean states the two results for models in ℝ^r,
+    which needs no definition beyond Mathlib's; a model in ℚ^r is one in ℝ^r, so they imply the
+    library statements for the Freiman dimension. The bound r ≤ 2κ - 1 is stated for a real κ,
+    a nonempty X and a cancellative monoid. Without cancellation it fails: if X has n ≥ 3
+    elements and X + X is a single point, then κ = 1/n is allowed and X has Freiman dimension 0
+    > 2κ - 1. The version inherited from DenseSetsWithoutLargeSumsets took κ in ℕ, with
+    2κ - 1 truncated, and needed neither assumption.
 
 review:
   status: "unchecked"
@@ -192,5 +201,29 @@ alignment:
       module: "SumOfSetsInSeveralDimensions.MinCardAdd"
       status: "proved"
       note: "minCardAddOfDimRight_eq_sumsetCardLowerBound is the statement for F'_d."
+    - source: "Not in the paper: Theorem 1 for Freiman models"
+      lean: "SumOfSetsInSeveralDimensions.card_add_sum_min_le_card_add_of_isAddFreimanIso_of_finrank_span_sub_eq'"
+      module: "Challenge"
+      status: "proved"
+      note: >-
+        For finite A, B in a commutative monoid with a Freiman model of A ∪ B in ℝ^r, with
+        r - 1 in place of d.
+    - source: "Not in the paper: the bound 2κ - 1 for Freiman models"
+      lean: "SumOfSetsInSeveralDimensions.le_two_mul_sub_one_of_isAddFreimanIso_of_finrank_span_sub_eq'"
+      module: "Challenge"
+      status: "proved"
+      note: >-
+        For a nonempty X in a cancellative commutative monoid with |X + X| ≤ κ|X|, κ real, and
+        a Freiman model of X in ℝ^r.
+    - source: "Not in the paper: Theorem 1 for sets of given Freiman dimension"
+      lean: "SumOfSetsInSeveralDimensions.card_add_sum_min_le_of_freimanDim_union"
+      module: "SumOfSetsInSeveralDimensions.FreimanDimensionSumsetBounds"
+      status: "proved"
+      note: "With r = freimanDim (A ∪ B) ≥ 1."
+    - source: "Not in the paper: the Freiman dimension is at most 2κ - 1"
+      lean: "SumOfSetsInSeveralDimensions.freimanDim_le_two_mul_sub_one_of_card_add_le"
+      module: "SumOfSetsInSeveralDimensions.FreimanDimensionSumsetBounds"
+      status: "proved"
+      note: "For a nonempty X in a cancellative commutative monoid and a real κ."
 
 acknowledgements: "Lean 4 and Mathlib; the Palomar registry template."
