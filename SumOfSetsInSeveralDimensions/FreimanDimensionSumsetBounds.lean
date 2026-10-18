@@ -64,10 +64,11 @@ lemma isAddFreimanIso_rationalVectorToReal_comp {G : Type*} [AddCommMonoid G] {d
     IsAddFreimanIso 2 (X : Set G) (X.image (rationalVectorToReal ∘ f) : Set (Fin d → ℝ))
       (rationalVectorToReal ∘ f) := by
   rw [isAddFreimanIso_two] at hf ⊢
-  refine ⟨?_, fun a ha b hb c hc e he ↦ ?_⟩
+  constructor
   · rw [coe_image]
     exact (rationalVectorToReal_injective.comp_injOn hf.1.injOn).bijOn_image
-  · simp only [Function.comp, ← rationalVectorToReal_add, rationalVectorToReal_injective.eq_iff]
+  · intro a ha b hb c hc e he
+    simp only [Function.comp, ← rationalVectorToReal_add, rationalVectorToReal_injective.eq_iff]
     exact hf.2 a ha b hb c hc e he
 
 /-- Two maps with the same fibres on `s` have images of `s` of the same size. -/
@@ -75,7 +76,7 @@ lemma card_image_eq_of_kernel_iff {α β γ : Type*} [DecidableEq β] [Decidable
     {s : Finset α} {f : α → β} {g : α → γ}
     (h : ∀ x ∈ s, ∀ y ∈ s, (f x = f y ↔ g x = g y)) :
     #(s.image f) = #(s.image g) := by
-  refine card_bij (fun b hb ↦ g (mem_image.mp hb).choose) ?_ ?_ ?_
+  apply card_bij (fun b hb ↦ g (mem_image.mp hb).choose)
   · intro b hb
     exact mem_image_of_mem g (mem_image.mp hb).choose_spec.1
   · intro b₁ hb₁ b₂ hb₂ hgb

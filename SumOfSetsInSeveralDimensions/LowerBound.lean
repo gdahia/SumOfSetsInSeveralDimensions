@@ -45,41 +45,28 @@ open scoped Pointwise
 /-- The inductive step for sets `X` and `Y` that contain `0` and whose other elements are
 lexicographically positive, given the bound for all pairs of sets with fewer points. -/
 private lemma sumsetCardLowerBound_le_card_add_of_zero_mem {D d : ℕ} {X Y : Finset (Fin D → ℝ)}
-    (ih : ∀ {e : ℕ} {A B : Finset (Fin D → ℝ)}, #A + #B < #Y + #X → B.Nonempty → #B ≤ #A →
-      (A + B).affineDim = e → sumsetCardLowerBound e #B #A ≤ #(A + B))
+    (ih : ∀ {e m n : ℕ} {X' Y' : Finset (Fin D → ℝ)}, #X' = m → #Y' = n →
+      m + n < #X + #Y → 1 ≤ m → m ≤ n → (X' + Y').affineDim = e →
+      sumsetCardLowerBound e m n ≤ #(X' + Y'))
     (h0X : 0 ∈ X) (h0Y : 0 ∈ Y) (hposX : ∀ x ∈ X, x ≠ 0 → 0 < toLex x)
     (hposY : ∀ y ∈ Y, y ≠ 0 → 0 < toLex y) (hX : 2 ≤ #X) (hXY : #X ≤ #Y)
     (hdim : (X + Y).affineDim = d) :
     sumsetCardLowerBound d #X #Y ≤ #(X + Y) := by
-  have hX' : (X.erase 0).Nonempty := by
-    rw [← card_pos, card_erase_of_mem h0X]
-    grind
   obtain ⟨hd, hcard⟩ | ⟨hd, hcard⟩ | ⟨hd, hcard⟩ | ⟨hd, hcard⟩ :=
     geometric_deletion_cases h0X h0Y hposX hposY hX (hX.trans hXY) hdim
-  · have hrec := ih (e := d) (A := Y.erase 0) (B := X.erase 0)
-      (by grind [card_erase_of_mem h0X, card_erase_of_mem h0Y]) hX'
-      (by grind [card_erase_of_mem h0X, card_erase_of_mem h0Y]) (by rwa [add_comm])
-    rw [card_erase_of_mem h0X, card_erase_of_mem h0Y, add_comm (Y.erase 0)] at hrec
-    exact sumsetCardLowerBound_of_full_case hX hrec hcard
-  · have hrec := ih (e := d - 1) (A := Y.erase 0) (B := X.erase 0)
-      (by grind [card_erase_of_mem h0X, card_erase_of_mem h0Y]) hX'
-      (by grind [card_erase_of_mem h0X, card_erase_of_mem h0Y]) (by rwa [add_comm])
-    rw [card_erase_of_mem h0X, card_erase_of_mem h0Y, add_comm (Y.erase 0)] at hrec
-    exact sumsetCardLowerBound_of_large_case hX hXY hrec hcard
-  · have hrec := ih (e := d - 1) (A := Y) (B := X.erase 0) (by grind [card_erase_of_mem h0X]) hX'
-      (by grind [card_erase_of_mem h0X]) (by rwa [add_comm])
-    rw [card_erase_of_mem h0X, add_comm Y] at hrec
-    exact sumsetCardLowerBound_of_small_case hX hXY hrec hcard
-  · obtain hXY | hXY := hXY.eq_or_lt
-    · have hrec := ih (A := X) (B := Y.erase 0) (by grind [card_erase_of_mem h0Y])
-        (card_pos.1 (by grind [card_erase_of_mem h0Y])) (by grind [card_erase_of_mem h0Y]) hd
-      rw [card_erase_of_mem h0Y, ← hXY] at hrec
-      rw [← hXY]
-      exact sumsetCardLowerBound_of_equal_right_case hX hrec hcard
-    · have hrec := ih (e := d - 1) (A := Y.erase 0) (B := X) (by grind [card_erase_of_mem h0Y])
-        (card_pos.1 (by grind)) (by grind [card_erase_of_mem h0Y]) (by rwa [add_comm])
-      rw [card_erase_of_mem h0Y, add_comm (Y.erase 0)] at hrec
-      exact sumsetCardLowerBound_of_strict_right_case (by grind) hXY hrec hcard
+  · refine sumsetCardLowerBound_of_full_case hX ?_ hcard
+    exact ih (card_erase_of_mem h0X) (card_erase_of_mem h0Y) (by grind) (by grind) (by grind) hd
+  · refine sumsetCardLowerBound_of_large_case hX hXY ?_ hcard
+    exact ih (card_erase_of_mem h0X) (card_erase_of_mem h0Y) (by grind) (by grind) (by grind) hd
+  · refine sumsetCardLowerBound_of_small_case hX hXY ?_ hcard
+    exact ih (card_erase_of_mem h0X) rfl (by grind) (by grind) (by grind) hd
+  obtain hXY | hXY := hXY.eq_or_lt
+  · rw [add_comm X (Y.erase 0)] at hd hcard
+    rw [← hXY]
+    refine sumsetCardLowerBound_of_equal_right_case hX ?_ hcard
+    exact ih (by grind [card_erase_of_mem h0Y]) rfl (by grind) (by grind) (by grind) hd
+  · refine sumsetCardLowerBound_of_strict_right_case (by grind) hXY ?_ hcard
+    exact ih rfl (card_erase_of_mem h0Y) (by grind) (by grind) (by grind) hd
 
 private lemma sumsetCardLowerBound_le_card_add {D d : ℕ} {A B : Finset (Fin D → ℝ)}
     (hB : B.Nonempty) (hBA : #B ≤ #A) (hdim : (A + B).affineDim = d) :
@@ -96,8 +83,9 @@ private lemma sumsetCardLowerBound_le_card_add {D d : ℕ} {A B : Finset (Fin D 
     (zero_mem_normalize hA) (fun x hx hx0 ↦ normalize_pos_of_ne_zero hB hx hx0)
     (fun y hy hy0 ↦ normalize_pos_of_ne_zero hA hy hy0) (by simpa [normalize_card] using hB2)
     (by simpa [normalize_card] using hBA) (by rwa [add_comm, normalize_add_dim])
-  intro e A' B' hlt hB' hBA' hdim'
-  exact ih _ (by grind [normalize_card hA, normalize_card hB]) hB' hBA' hdim' rfl
+  rintro e m k X Y rfl rfl hlt hm hmk hdim'
+  rw [add_comm X] at hdim' ⊢
+  exact ih _ (by grind [normalize_card hA, normalize_card hB]) (card_pos.1 hm) hmk hdim' rfl
 
 /-- **Ruzsa's theorem.** If `A, B ⊆ ℝ^D` are finite, `B` is nonempty, `|B| ≤ |A|` and `A + B` has
 affine dimension `d`, then `|A| + ∑ t ∈ {1, …, |B| - 1}, min d (|A| - t) ≤ |A + B|`. -/

@@ -205,7 +205,7 @@ private lemma exists_card_add_le_of_lt {m n : ℕ} (hmn : m ≤ n) (hn : e + 2 �
   have h := two_mul_sumsetCardLowerBound_add_add (d := t + c + 1 + 1) (m := c + 2 + p)
     (n := c + 2 + p + t) (by grind) (by grind) (by grind)
   rw [Nat.add_sub_cancel_left] at h
-  refine (card_axisUnionBasis_add_le (Or.inr le_rfl) (by grind)).trans ?_
+  apply (card_axisUnionBasis_add_le (Or.inr le_rfl) (by grind)).trans
   rw [(by grind : t + c + 1 - (c + 1) = t)]
   nlinarith [two_mul_choose_two_add_one (c + 1)]
 

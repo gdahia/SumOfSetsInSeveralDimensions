@@ -12,12 +12,10 @@ project:
     the bound, and so is the bound 2κ - 1, for a real κ, on the Freiman dimension of a set X
     with |X + X| ≤ κ|X|.
   authors:
-    - name: "Gabriel Dahia"
-      github: "gdahia"
+    - "Gabriel Dahia"
   license: "Apache-2.0"
   responsible_maintainers:
-    - name: "Gabriel Dahia"
-      github: "gdahia"
+    - "Gabriel Dahia"
 
 classification:
   arxiv: ["math.CO", "math.NT"]
@@ -28,7 +26,7 @@ sources:
     authors:
       - "Imre Z. Ruzsa"
     id: "https://doi.org/10.1007/BF01302969"
-    type: "article"
+    type: "paper"
     location: "https://doi.org/10.1007/BF01302969"
     relationship: "formalizes"
     note: >-
@@ -113,10 +111,11 @@ fidelity:
     k = max(1, d - (n - m)), which for n - m ≥ d is the set {0, …, (m - 1) e₁} of the paper.
 
 review:
-  status: "unchecked"
-  reviewers: []
+  status: "self-assessed"
+  reviewers: ["Gabriel Dahia"]
   notes: >-
-    No mathematical or formalization review of this repository.
+    Gabriel Dahia read the statements and proofs and checked them for mathematical correctness
+    and style.
 
 alignment:
   namespace: "SumOfSetsInSeveralDimensions"
