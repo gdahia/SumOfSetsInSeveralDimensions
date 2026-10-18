@@ -26,6 +26,8 @@ the differences of the points of `S`.
 
 * `finsetAffineDim_eq_finrank_vectorSpan`: `finsetAffineDim S` is the dimension of
   `vectorSpan ℝ S`.
+* `finsetAffineDim_eq_finrank_span_sub`: `finsetAffineDim S` is the dimension of the span of
+  `S - S`.
 * `finsetAffineDim_mono`: the affine dimension is monotone.
 * `finsetAffineDim_vadd_finset`, `finsetAffineDim_image_add_left`,
   `finsetAffineDim_image_add_right`, `finsetAffineDim_image_sub`: it is invariant under
@@ -52,6 +54,12 @@ noncomputable def finsetAffineDim (S : Finset (Fin D → ℝ)) : ℕ :=
 lemma finsetAffineDim_eq_finrank_vectorSpan (S : Finset (Fin D → ℝ)) :
     finsetAffineDim S = Module.finrank ℝ (vectorSpan ℝ (S : Set (Fin D → ℝ))) := by
   rw [finsetAffineDim, direction_affineSpan]
+
+/-- The affine dimension of `S` is the dimension of the span of `S - S`. -/
+lemma finsetAffineDim_eq_finrank_span_sub (S : Finset (Fin D → ℝ)) :
+    finsetAffineDim S = Module.finrank ℝ (Submodule.span ℝ (↑S - ↑S : Set (Fin D → ℝ))) := by
+  rw [finsetAffineDim_eq_finrank_vectorSpan, vectorSpan_def]
+  rfl
 
 /-- Affine dimension is monotone under inclusion of finite sets. -/
 lemma finsetAffineDim_mono {S T : Finset (Fin D → ℝ)}

@@ -32,6 +32,9 @@ include those excluded by the second condition.
 ## Main statements
 
 * `minCardAdd_eq_sumsetCardLowerBound`, `minCardAddOfDimRight_eq_sumsetCardLowerBound`: Theorem 2.
+* `sInf_card_add_eq_add_sum_min`, `sInf_card_add_of_finrank_span_sub_right_eq_add_sum_min`:
+  Theorem 2 with `F_d`, `F'_d` and `G_d` unfolded and the affine dimension written as the
+  dimension of the span of the differences.
 -/
 
 @[expose] public section
@@ -85,5 +88,24 @@ theorem minCardAddOfDimRight_eq_sumsetCardLowerBound (hd : 1 ≤ d) (hm : 1 ≤ 
   refine sumsetCardLowerBound_le_card_add hm hmn hA' hB' ?_
   rw [add_comm]
   exact finsetAffineDim_add_eq_of_left_eq (card_pos.1 (by grind)) hBdim'
+
+/-- Theorem 2 of Ruzsa for `F_d`, with `F_d` and `G_d` unfolded and the affine dimension of
+`A + B` written as the dimension of the span of `(A + B) - (A + B)`. -/
+theorem sInf_card_add_eq_add_sum_min (hd : 1 ≤ d) (hm : 1 ≤ m) (hmn : m ≤ n) (hn : d + 1 ≤ n) :
+    sInf {k | ∃ A B : Finset (Fin d → ℝ), #A = m ∧ #B = n ∧
+      Module.finrank ℝ (Submodule.span ℝ (↑(A + B) - ↑(A + B) : Set (Fin d → ℝ))) = d ∧
+      #(A + B) = k} = n + ∑ j ∈ Icc 1 (m - 1), min d (n - j) := by
+  simp_rw [← finsetAffineDim_eq_finrank_span_sub, ← sumsetCardLowerBound_eq]
+  exact minCardAdd_eq_sumsetCardLowerBound hd hm hmn hn
+
+/-- Theorem 2 of Ruzsa for `F'_d`, with `F'_d` and `G_d` unfolded and the affine dimension of `B`
+written as the dimension of the span of `B - B`. -/
+theorem sInf_card_add_of_finrank_span_sub_right_eq_add_sum_min (hd : 1 ≤ d) (hm : 1 ≤ m)
+    (hmn : m ≤ n) (hn : d + 1 ≤ n) :
+    sInf {k | ∃ A B : Finset (Fin d → ℝ), #A = m ∧ #B = n ∧
+      Module.finrank ℝ (Submodule.span ℝ (↑B - ↑B : Set (Fin d → ℝ))) = d ∧ #(A + B) = k} =
+      n + ∑ j ∈ Icc 1 (m - 1), min d (n - j) := by
+  simp_rw [← finsetAffineDim_eq_finrank_span_sub, ← sumsetCardLowerBound_eq]
+  exact minCardAddOfDimRight_eq_sumsetCardLowerBound hd hm hmn hn
 
 end SumOfSetsInSeveralDimensions

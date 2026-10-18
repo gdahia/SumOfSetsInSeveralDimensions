@@ -26,6 +26,8 @@ dimension of `A + B`, then `|A + B| ≥ |A| + d * |B| - d * (d + 1) / 2`.
 
 * `card_add_mul_card_le_card_add_add`: the bound, as `|A| + d * |B| ≤ |A + B| + d * (d + 1) / 2`
   in `ℕ`.
+* `card_add_mul_card_le_card_add_add_of_le_finrank_span_sub`: the same bound, with the affine
+  dimension written as the dimension of the span of `(A + B) - (A + B)`.
 * `two_mul_card_add_mul_card_le`: the same bound multiplied by two, without division.
 * `card_add_mul_card_sub_le_card_add`: the same bound in `ℝ`.
 * `max_card_add_mul_min_card_le_card_add_add`: the bound without the assumption `|B| ≤ |A|`, with
@@ -80,6 +82,15 @@ theorem card_add_mul_card_le_card_add_add (hB : B.Nonempty) (hBA : #B ≤ #A)
     (hd : d ≤ finsetAffineDim (A + B)) :
     #A + d * #B ≤ #(A + B) + d * (d + 1) / 2 := by
   grind [two_mul_card_add_mul_card_le hB hBA hd]
+
+/-- The asymmetric form of Freiman's lemma, with the affine dimension of `A + B` written as the
+dimension of the span of `(A + B) - (A + B)`. -/
+theorem card_add_mul_card_le_card_add_add_of_le_finrank_span_sub (hB : B.Nonempty)
+    (hBA : #B ≤ #A)
+    (hd : d ≤ Module.finrank ℝ (Submodule.span ℝ (↑(A + B) - ↑(A + B) : Set (Fin D → ℝ)))) :
+    #A + d * #B ≤ #(A + B) + d * (d + 1) / 2 :=
+  card_add_mul_card_le_card_add_add hB hBA
+    (hd.trans_eq (finsetAffineDim_eq_finrank_span_sub _).symm)
 
 /-- The asymmetric form of Freiman's lemma in `ℝ`: `|A| + d * |B| - d * (d + 1) / 2 ≤ |A + B|`. -/
 lemma card_add_mul_card_sub_le_card_add (hB : B.Nonempty) (hBA : #B ≤ #A)

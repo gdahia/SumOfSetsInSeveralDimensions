@@ -34,19 +34,18 @@ $$G_d(m, n) = n + \sum_{j=1}^{m-1} \min(d, n - j),$$
 and so is the least size of $A + B$ with $B$ of affine dimension $d$. The paper also excludes the
 pairs with $m \le n - m \le d$, but its construction covers them.
 
-[Solution.lean](Solution.lean) proves these four statements. [Challenge.lean](Challenge.lean)
-contains them in terms of Mathlib, with the affine dimension of a set $S$ written as
-`Module.finrank ℝ (Submodule.span ℝ (↑S - ↑S))`, the rank of the span of the differences, and
-with `sorry` placeholders. The library and the solution contain no `sorry`, and the theorems
+The library states these four theorems with the affine dimension of a set $S$ written as
+`Module.finrank ℝ (Submodule.span ℝ (↑S - ↑S))`, the rank of the span of the differences.
+[Challenge.lean](Challenge.lean) contains the same statements in terms of Mathlib, under the same
+names with a prime and with `sorry` placeholders, and [Solution.lean](Solution.lean) proves each
+of them by the library theorem. The library and the solution contain no `sorry`, and the theorems
 depend on no axioms other than `propext`, `Classical.choice` and `Quot.sound`.
-
-The library states the theorems with the definition `finsetAffineDim`. Its other statements are
-the following.
 
 | Declaration | Statement |
 | --- | --- |
 | `finsetAffineDim S` | `Module.finrank ℝ (affineSpan ℝ ↑S).direction` |
 | `finsetAffineDim_eq_finrank_vectorSpan` | `finsetAffineDim S = Module.finrank ℝ (vectorSpan ℝ ↑S)` |
+| `finsetAffineDim_eq_finrank_span_sub` | `finsetAffineDim S = Module.finrank ℝ (Submodule.span ℝ (↑S - ↑S))` |
 | `finsetAffineDim_mono` | `finsetAffineDim S ≤ finsetAffineDim T` if `S ⊆ T` |
 | `finsetAffineDim_le` | `finsetAffineDim S ≤ D` |
 | `finsetAffineDim_vadd_finset`, `finsetAffineDim_image_add_left`, `finsetAffineDim_image_add_right`, `finsetAffineDim_image_sub` | A translate of `S` has the affine dimension of `S` |

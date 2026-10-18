@@ -31,6 +31,8 @@ bound for the smaller sets with the bound for `A` and `B`.
 * `card_add_sum_min_le_card_add`: Ruzsa's theorem.
 * `card_add_sum_min_le_card_add_of_le`: the same bound for every `d` at most the affine dimension
   of `A + B`.
+* `card_add_sum_min_le_card_add_of_finrank_span_sub_eq`: Ruzsa's theorem, with the affine
+  dimension written as the dimension of the span of `(A + B) - (A + B)`.
 -/
 
 public section
@@ -111,5 +113,13 @@ lemma card_add_sum_min_le_card_add_of_le {D d : ℕ} {A B : Finset (Fin D → �
     #A + ∑ t ∈ Icc 1 (#B - 1), min d (#A - t) ≤ #(A + B) := by
   refine le_trans ?_ (card_add_sum_min_le_card_add hB hBA rfl)
   gcongr
+
+/-- Ruzsa's theorem, with the affine dimension of `A + B` written as the dimension of the span of
+`(A + B) - (A + B)`. -/
+theorem card_add_sum_min_le_card_add_of_finrank_span_sub_eq {D d : ℕ}
+    {A B : Finset (Fin D → ℝ)} (hB : B.Nonempty) (hBA : #B ≤ #A)
+    (hdim : Module.finrank ℝ (Submodule.span ℝ (↑(A + B) - ↑(A + B) : Set (Fin D → ℝ))) = d) :
+    #A + ∑ t ∈ Icc 1 (#B - 1), min d (#A - t) ≤ #(A + B) :=
+  card_add_sum_min_le_card_add hB hBA ((finsetAffineDim_eq_finrank_span_sub _).trans hdim)
 
 end SumOfSetsInSeveralDimensions
