@@ -12,15 +12,15 @@ of its affine span, that is, of the subspace spanned by the differences of the p
 
 **Theorem 1**
 (`SumOfSetsInSeveralDimensions.card_add_sum_min_le_card_add_of_finrank_span_sub_eq`). Let
-$A, B \subseteq \mathbb{R}^D$ be finite sets with $B$ nonempty and $|B| \le |A|$, and let $d$ be
-the affine dimension of $A + B$. Then
+$A, B \subseteq \mathbb{R}^D$ be finite sets with $B$ nonempty and $|B| \le |A|$. If $d$ is
+the affine dimension of $A + B$, then
 
 $$|A + B| \ge |A| + \sum_{t=1}^{|B|-1} \min(d, |A| - t).$$
 
 **Corollary 1.1**
 (`SumOfSetsInSeveralDimensions.card_add_mul_card_le_card_add_add_of_le_finrank_span_sub`). Let
-$A, B \subseteq \mathbb{R}^D$ be finite sets with $B$ nonempty and $|B| \le |A|$, and let $d$ be
-at most the affine dimension of $A + B$. Then
+$A, B \subseteq \mathbb{R}^D$ be finite sets with $B$ nonempty and $|B| \le |A|$. If $d$ is
+at most the affine dimension of $A + B$, then
 
 $$|A| + d|B| \le |A + B| + \frac{d(d+1)}{2}.$$
 
@@ -31,17 +31,16 @@ $A, B \subseteq \mathbb{R}^d$ with $|A| = m$, $|B| = n$ and $A + B$ of affine di
 
 $$G_d(m, n) = n + \sum_{j=1}^{m-1} \min(d, n - j),$$
 
-and so is the least size of $A + B$ with $B$ of affine dimension $d$. The paper also excludes the
-pairs with $m \le n - m \le d$, but its construction covers them.
+and so is the least size of $A + B$ with $B$ of affine dimension $d$.
 
-Two consequences are not in the paper. A Freiman model of a finite subset $X$ of a commutative
-monoid is a Freiman isomorphism of order 2 from $X$ onto a set in $\mathbb{R}^r$ of affine
-dimension $r$.
+Two results formalized here are not in the paper. A Freiman model of a finite subset $X$ of a
+commutative monoid is a Freiman isomorphism of order 2 from $X$ onto a set in $\mathbb{R}^r$ of
+affine dimension $r$.
 
 **Theorem 1 for Freiman models**
 (`SumOfSetsInSeveralDimensions.card_add_sum_min_le_card_add_of_isAddFreimanIso_of_finrank_span_sub_eq`).
-Let $A, B$ be finite subsets of a commutative monoid with $B$ nonempty and $|B| \le |A|$, and let
-$A \cup B$ have a Freiman model in $\mathbb{R}^r$. Then
+Let $A, B$ be finite subsets of a commutative monoid with $B$ nonempty and $|B| \le |A|$. If
+$A \cup B$ has a Freiman model in $\mathbb{R}^r$, then
 
 $$|A + B| \ge |A| + \sum_{t=1}^{|B|-1} \min(r - 1, |A| - t).$$
 
@@ -61,30 +60,9 @@ depend on no axioms other than `propext`, `Classical.choice` and `Quot.sound`.
 | Declaration | Statement |
 | --- | --- |
 | `finsetAffineDim S` | `Module.finrank ℝ (affineSpan ℝ ↑S).direction` |
-| `finsetAffineDim_eq_finrank_vectorSpan` | `finsetAffineDim S = Module.finrank ℝ (vectorSpan ℝ ↑S)` |
-| `finsetAffineDim_eq_finrank_span_sub` | `finsetAffineDim S = Module.finrank ℝ (Submodule.span ℝ (↑S - ↑S))` |
-| `finsetAffineDim_mono` | `finsetAffineDim S ≤ finsetAffineDim T` if `S ⊆ T` |
-| `finsetAffineDim_le` | `finsetAffineDim S ≤ D` |
-| `finsetAffineDim_vadd_finset`, `finsetAffineDim_image_add_left`, `finsetAffineDim_image_add_right`, `finsetAffineDim_image_sub` | A translate of `S` has the affine dimension of `S` |
-| `finsetAffineDim_add_one_le_card` | `finsetAffineDim S + 1 ≤ \|S\|` if `S` is nonempty |
-| `finsetAffineDim_le_finsetAffineDim_add_right`, `finsetAffineDim_le_finsetAffineDim_add_left` | `A` and `B` have affine dimension at most that of `A + B` if `B`, respectively `A`, is nonempty |
-| `finsetAffineDim_add_eq_of_left_eq` | `A + B` has affine dimension `D` if `A` has and `B` is nonempty |
-| `finsetAffineDim_union_le_sum_add_one` | `finsetAffineDim (A ∪ B) ≤ finsetAffineDim (A + B) + 1` if `A` and `B` are nonempty |
-| `geometric_deletion_cases` | Lemma 2.1 of the paper |
-| `card_add_sum_min_le_card_add_of_le` | Theorem 1 for every `d ≤ finsetAffineDim (A + B)` |
-| `two_mul_card_add_mul_card_le` | `2 * (\|A\| + d * \|B\|) ≤ 2 * \|A + B\| + d * (d + 1)` |
-| `card_add_mul_card_sub_le_card_add` | `\|A\| + d * \|B\| - d * (d + 1) / 2 ≤ \|A + B\|` in `ℝ` |
-| `max_card_add_mul_min_card_le_card_add_add` | Corollary 1.1 for nonempty `A` and `B`, with `max \|A\| \|B\|` and `min \|A\| \|B\|` in place of `\|A\|` and `\|B\|` |
-| `sumsetCardLowerBound_of_add_le` | Formula (1.5): `G_d(m, n) = n + d * (m - 1)` if `m + d ≤ n + 1` |
-| `two_mul_sumsetCardLowerBound_add_add`, `two_mul_sumsetCardLowerBound_add` | Formula (1.6), if `m ≤ n < m + d` and `d < n` |
-| `two_mul_sumsetCardLowerBound_of_le` | Formula (1.7): `2 * G_d(m, n) = 2 * n + (m - 1) * (2 * n - m)` if `1 ≤ m ≤ n ≤ d` |
-| `exists_card_add_eq_sumsetCardLowerBound` | The sets of Section 3, with `\|A + B\| = G_d(m, n)` |
 | `minCardAdd_eq_sumsetCardLowerBound`, `minCardAddOfDimRight_eq_sumsetCardLowerBound` | Theorem 2, with the minima `F_d` and `F'_d` of the paper as definitions |
 | `freimanDim X` | The Freiman dimension of a finite subset `X` of a commutative monoid |
-| `card_add_sum_min_le_card_add_of_isAddFreimanIso` | Theorem 1 for Freiman models, with `finsetAffineDim` |
 | `card_add_sum_min_le_of_freimanDim_union` | Theorem 1 for `B` nonempty, `\|B\| ≤ \|A\|` and `freimanDim (A ∪ B) = r ≥ 1`, with `r - 1` in place of `d` |
-| `card_add_mul_card_sub_choose_le_card_add_of_freimanDim_union` | Under the same hypotheses, `\|A\| + (r - 1) * \|B\| - (r + 1).choose 2 ≤ \|A + B\|` |
-| `le_two_mul_sub_one_of_isAddFreimanIso` | `r ≤ 2 * κ - 1` for a Freiman model in `ℝ^r`, with `finsetAffineDim` |
 | `freimanDim_le_two_mul_sub_one_of_card_add_le` | `freimanDim X ≤ 2 * κ - 1` if `X` is nonempty and `\|X + X\| ≤ κ * \|X\|`, for a real `κ` and a cancellative monoid |
 
 ## Files

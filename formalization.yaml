@@ -87,53 +87,30 @@ automation:
         environment.
   spend_usd: "not tracked"
   notes: >-
-    The first proof of Theorem 1 and the Freiman dimension were written by Codex agents in
-    DenseSetsWithoutLargeSumsets. Claude Code, directed by Gabriel Dahia, assembled this
-    repository, rewrote those proofs, and wrote the remaining statements and proofs,
-    Challenge.lean, Solution.lean and this file. The solution theorems use only propext,
-    Classical.choice and Quot.sound.
+    The first proof of Theorem 1 and the Freiman dimension were written by Codex agents.
+    Claude Code, directed by Gabriel Dahia, assembled this repository, rewrote those
+    proofs, and wrote the remaining statements and proofs, Challenge.lean, Solution.lean
+    and this file. The solution theorems use only propext, Classical.choice and Quot.sound.
 
 fidelity:
   divergences: >-
-    The paper writes |A| = m ≤ |B| = n. Theorem 1 and Corollary 1.1 are stated here with the
-    roles of A and B exchanged, |B| ≤ |A|, as the bound
-    |A| + Σ_{t=1}^{|B|-1} min(d, |A| - t) ≤ |A + B| for the sets themselves rather than for
-    the minimum F_d(m, n). The ambient space is Fin D → ℝ for an arbitrary D, and d is the
-    affine dimension of A + B, the dimension of the direction of its affine span. This
-    direction is the span of the differences of the elements of A + B, and Challenge.lean
-    writes d as the rank of that span, with the pointwise difference of sets. Thus d ≤ D,
-    and d < D is allowed. The set B is assumed nonempty instead of m + n ≥ d + 2.
+    Theorem 1 and Corollary 1.1 are stated as bounds for the sets themselves rather than for
+    the minimum F_d(m, n). The sets lie in Fin D → ℝ for an arbitrary D, and d is the affine
+    dimension of A + B, so d < D is allowed. The set B is assumed nonempty instead of
+    m + n ≥ d + 2. Corollary 1.1 is stated for every d at most the affine dimension of A + B.
 
-    The closed form is stated in ℕ as |A| + d|B| ≤ |A + B| + d(d+1)/2, for every d at most
-    the affine dimension of A + B. The library also has it multiplied by two, in ℝ, and
-    with the maximum and the minimum of |A| and |B| when neither set is assumed to be the
-    larger.
-
-    The proof of Theorem 1 follows Lemma 2.1 and its four cases, with the lexicographic
-    order on Fin D → ℝ in place of a linear functional that separates the points of A ∪ B.
+    The proof of Theorem 1 uses the lexicographic order on Fin D → ℝ in place of a linear
+    functional that separates the points of A ∪ B.
 
     Formula (1.5) is proved for n - m ≥ d - 1, and the paper states it for n - m ≥ d.
     Formulas (1.6) and (1.7) are stated multiplied by two, without division.
 
-    Theorem 2 is stated as the equality of a least element, an sInf over a set of natural
-    numbers, with G_d(m, n), for d ≥ 1, 1 ≤ m ≤ n and n ≥ d + 1. The paper also excludes the
-    pairs with m ≤ n - m ≤ d. The construction of Section 3 attains G_d(m, n) for those pairs
-    too, so they are not excluded here. In that construction, for n - m < d, the paper lists
-    the sums e_i + e_j with 2 ≤ i, j ≤ k and counts k(k - 1)/2 of them, but the sums with
-    i ≤ k < j occur as well; the final value of |A + B| in the paper, G_d(m, n), is correct
-    and is the one proved here. The set A is {0, e₁, …, (m - k) e₁} ∪ {e₂, …, e_k} with
+    Theorem 2 does not exclude the pairs with m ≤ n - m ≤ d, which the paper does: the
+    construction of Section 3 attains G_d(m, n) for them too. In that construction, for
+    n - m < d, the paper lists the sums e_i + e_j with 2 ≤ i, j ≤ k and counts k(k - 1)/2 of
+    them, but the sums with i ≤ k < j occur as well; the final value G_d(m, n) is correct and
+    is the one proved here. The set A is {0, e₁, …, (m - k) e₁} ∪ {e₂, …, e_k} with
     k = max(1, d - (n - m)), which for n - m ≥ d is the set {0, …, (m - 1) e₁} of the paper.
-
-    The Freiman dimension and its bound by the doubling are not in the paper. A Freiman model
-    of a finite set X in a commutative monoid is a Freiman isomorphism of order 2 from X onto a
-    set in ℝ^r of affine dimension r, and the Freiman dimension of X is the largest r ≤ |X| for
-    which X has a model in ℚ^r. Challenge.lean states the two results for models in ℝ^r,
-    which needs no definition beyond Mathlib's; a model in ℚ^r is one in ℝ^r, so they imply the
-    library statements for the Freiman dimension. The bound r ≤ 2κ - 1 is stated for a real κ,
-    a nonempty X and a cancellative monoid. Without cancellation it fails: if X has n ≥ 3
-    elements and X + X is a single point, then κ = 1/n is allowed and X has Freiman dimension 0
-    > 2κ - 1. The version inherited from DenseSetsWithoutLargeSumsets took κ in ℕ, with
-    2κ - 1 truncated, and needed neither assumption.
 
 review:
   status: "unchecked"
