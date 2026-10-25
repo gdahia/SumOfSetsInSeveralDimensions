@@ -33,7 +33,7 @@ $$G_d(m, n) = n + \sum_{j=1}^{m-1} \min(d, n - j),$$
 
 and so is the least size of $A + B$ with $B$ of affine dimension $d$.
 
-Two results formalized here are not in the paper. A Freiman model of a finite subset $X$ of a
+Three results formalized here are not in the paper. A Freiman model of a finite subset $X$ of a
 commutative monoid is a Freiman isomorphism of order 2 from $X$ onto a set in $\mathbb{R}^r$ of
 affine dimension $r$.
 
@@ -50,7 +50,17 @@ Let $X$ be a nonempty finite subset of a cancellative commutative monoid with
 $|X + X| \le \kappa |X|$ for a real $\kappa$. If $X$ has a Freiman model in $\mathbb{R}^r$, then
 $r \le 2\kappa - 1$.
 
-The library states these six theorems with the affine dimension of a set $S$ written as
+**Freiman's lemma for Freiman models**
+(`SumOfSetsInSeveralDimensions.le_sub_one_add_mul_div_card_of_isAddFreimanIso_of_finrank_span_sub_eq`).
+Under the same hypotheses,
+
+$$r \le \kappa - 1 + \frac{\kappa(2\kappa - 1)}{|X|}.$$
+
+The error term tends to $0$ as $|X| \to \infty$ with $\kappa$ fixed. The proof applies Corollary 1.1
+to the model of $X$ with $d = r$, which gives $(r + 1)|X| - r(r + 1)/2 \le \kappa |X|$, and bounds
+$r(r + 1)/2$ by $\kappa(2\kappa - 1)$ with $r \le 2\kappa - 1$.
+
+The library states these seven theorems with the affine dimension of a set $S$ written as
 `Module.finrank ℝ (Submodule.span ℝ (↑S - ↑S))`, the rank of the span of the differences.
 [Challenge.lean](Challenge.lean) contains the same statements in terms of Mathlib, under the same
 names with a prime and with `sorry` placeholders, and [Solution.lean](Solution.lean) proves each
@@ -64,6 +74,7 @@ depend on no axioms other than `propext`, `Classical.choice` and `Quot.sound`.
 | `freimanDim X` | The Freiman dimension of a finite subset `X` of a commutative monoid |
 | `card_add_sum_min_le_of_freimanDim_union` | Theorem 1 for `B` nonempty, `\|B\| ≤ \|A\|` and `freimanDim (A ∪ B) = r ≥ 1`, with `r - 1` in place of `d` |
 | `freimanDim_le_two_mul_sub_one_of_card_add_le` | `freimanDim X ≤ 2 * κ - 1` if `X` is nonempty and `\|X + X\| ≤ κ * \|X\|`, for a real `κ` and a cancellative monoid |
+| `freimanDim_le_sub_one_add_mul_div_card_of_card_add_le` | `freimanDim X ≤ κ - 1 + κ * (2 * κ - 1) / \|X\|` under the same hypotheses |
 
 ## Files
 
@@ -80,7 +91,7 @@ depend on no axioms other than `propext`, `Classical.choice` and `Quot.sound`.
 | `Construction.lean` | The sets of Section 3 |
 | `MinCardAdd.lean` | Theorem 2 |
 | `FreimanDimension.lean` | The Freiman dimension |
-| `FreimanDimensionSumsetBounds.lean` | Theorem 1 for Freiman models and sets of given Freiman dimension, and the bound `2 * κ - 1` |
+| `FreimanDimensionSumsetBounds.lean` | Theorem 1 for Freiman models and sets of given Freiman dimension, and the bounds `2 * κ - 1` and `κ - 1 + κ * (2 * κ - 1) / \|X\|` |
 
 [formalization.yaml](formalization.yaml) records the differences from the paper, the scope, and
 the use of AI coding agents.

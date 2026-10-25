@@ -14,6 +14,7 @@ import Mathlib.Data.Nat.Choose.Sum
 import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 import Mathlib.Tactic.Linarith
 import SumOfSetsInSeveralDimensions.AffineDimSumset
+import SumOfSetsInSeveralDimensions.ClosedForm
 import SumOfSetsInSeveralDimensions.LowerBound
 
 /-!
@@ -26,6 +27,10 @@ dimension `r`. Then `f` sends `A` and `B` to sets `A'` and `B'` with `|A'| = |A|
 gives `|A| + ∑ t ∈ {1, …, |B| - 1}, min (r - 1) (|A| - t) ≤ |A + B|`. A Freiman model in `ℚ^r` is
 one in `ℝ^r`, so this holds when `r ≥ 1` is the Freiman dimension of `A ∪ B`.
 
+For `A = B = X` the model `f(X) + f(X)` has affine dimension `r`, and the asymmetric form of
+Freiman's lemma gives `(r + 1) * |X| - r * (r + 1) / 2 ≤ |X + X|`. If `|X + X| ≤ κ * |X|`, then
+`r ≤ 2 * κ - 1`, so `r * (r + 1) / 2 ≤ κ * (2 * κ - 1)` and `r ≤ κ - 1 + κ * (2 * κ - 1) / |X|`.
+
 ## Main statements
 
 * `card_add_sum_min_le_card_add_of_isAddFreimanIso`: the bound above.
@@ -36,6 +41,10 @@ one in `ℝ^r`, so this holds when `r ≥ 1` is the Freiman dimension of `A ∪ 
   model of `X` in `ℝ^r` of affine dimension `r` has `r ≤ 2 * κ - 1`.
 * `freimanDim_le_two_mul_sub_one_of_card_add_le`: if `|X + X| ≤ κ * |X|`, then
   `freimanDim X ≤ 2 * κ - 1`.
+* `le_sub_one_add_mul_div_card_of_isAddFreimanIso`: under the same hypotheses,
+  `r ≤ κ - 1 + κ * (2 * κ - 1) / |X|`.
+* `freimanDim_le_sub_one_add_mul_div_card_of_card_add_le`: if `|X + X| ≤ κ * |X|`, then
+  `freimanDim X ≤ κ - 1 + κ * (2 * κ - 1) / |X|`.
 -/
 
 @[expose] public section
@@ -252,6 +261,48 @@ theorem freimanDim_le_two_mul_sub_one_of_card_add_le {G : Type*} [DecidableEq G]
   obtain ⟨f, hf, haff⟩ := Nat.findGreatest_of_ne_zero (rfl : freimanDim X = _) hr.ne'
   exact le_two_mul_sub_one_of_isAddFreimanIso hX hXX (isAddFreimanIso_rationalVectorToReal_comp hf)
     (by rwa [← image_image])
+
+/-- If `|X + X| ≤ κ * |X|` for a nonempty `X` and `f` is a Freiman isomorphism of order `2` from
+`X` onto a subset of `ℝ^r` of affine dimension `r`, then `r ≤ κ - 1 + κ * (2 * κ - 1) / |X|`. -/
+theorem le_sub_one_add_mul_div_card_of_isAddFreimanIso {G : Type*} [DecidableEq G]
+    [AddCancelCommMonoid G] {r : ℕ} {κ : ℝ} {X : Finset G} {f : G → Fin r → ℝ}
+    (hX : X.Nonempty) (hXX : (#(X + X) : ℝ) ≤ κ * #X)
+    (hf : IsAddFreimanIso 2 (X : Set G) (X.image f : Set (Fin r → ℝ)) f)
+    (hdim : (X.image f).affineDim = r) : r ≤ κ - 1 + κ * (2 * κ - 1) / #X := by
+  have h := card_add_mul_card_sub_le_card_add (hX.image f) le_rfl
+    (hdim.symm.trans_le (affineDim_le_affineDim_add_right _ (hX.image f)))
+  rw [card_image_of_injOn hf.bijOn.injOn,
+    card_add_image_of_isAddFreimanIso hf subset_rfl subset_rfl] at h
+  have hr := le_two_mul_sub_one_of_isAddFreimanIso hX hXX hf hdim
+  rw [← sub_le_iff_le_add', le_div_iff₀ (mod_cast hX.card_pos)]
+  nlinarith [mul_nonneg (sub_nonneg.2 hr) (by linarith : (0 : ℝ) ≤ 2 * κ + r)]
+
+/-- The bound `r ≤ κ - 1 + κ * (2 * κ - 1) / |X|` for a Freiman model, with the affine dimension
+of the model written as the dimension of the span of its differences. -/
+theorem le_sub_one_add_mul_div_card_of_isAddFreimanIso_of_finrank_span_sub_eq {G : Type*}
+    [DecidableEq G] [AddCancelCommMonoid G] {r : ℕ} {κ : ℝ} {X : Finset G} {f : G → Fin r → ℝ}
+    (hX : X.Nonempty) (hXX : (#(X + X) : ℝ) ≤ κ * #X)
+    (hf : IsAddFreimanIso 2 (X : Set G) (X.image f : Set (Fin r → ℝ)) f)
+    (hdim : Module.finrank ℝ (Submodule.span ℝ (↑(X.image f) - ↑(X.image f) : Set (Fin r → ℝ))) =
+      r) :
+    r ≤ κ - 1 + κ * (2 * κ - 1) / #X :=
+  le_sub_one_add_mul_div_card_of_isAddFreimanIso hX hXX hf
+    ((affineDim_eq_finrank_span_sub _).trans hdim)
+
+/-- If `|X + X| ≤ κ * |X|` for a nonempty `X`, then `X` has Freiman dimension at most
+`κ - 1 + κ * (2 * κ - 1) / |X|`. -/
+theorem freimanDim_le_sub_one_add_mul_div_card_of_card_add_le {G : Type*} [DecidableEq G]
+    [AddCancelCommMonoid G] {κ : ℝ} {X : Finset G} (hX : X.Nonempty)
+    (hXX : (#(X + X) : ℝ) ≤ κ * #X) : freimanDim X ≤ κ - 1 + κ * (2 * κ - 1) / #X := by
+  classical
+  obtain hr | hr := (freimanDim X).eq_zero_or_pos
+  · rw [hr, Nat.cast_zero]
+    have hκ := one_le_of_card_add_le hX hXX
+    have : 0 ≤ κ * (2 * κ - 1) / #X := div_nonneg (by nlinarith) (Nat.cast_nonneg _)
+    linarith
+  obtain ⟨f, hf, haff⟩ := Nat.findGreatest_of_ne_zero (rfl : freimanDim X = _) hr.ne'
+  exact le_sub_one_add_mul_div_card_of_isAddFreimanIso hX hXX
+    (isAddFreimanIso_rationalVectorToReal_comp hf) (by rwa [← image_image])
 
 end
 

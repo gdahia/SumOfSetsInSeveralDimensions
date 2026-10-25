@@ -87,4 +87,17 @@ theorem le_two_mul_sub_one_of_isAddFreimanIso_of_finrank_span_sub_eq' {G : Type*
     (r : ℝ) ≤ 2 * κ - 1 :=
   le_two_mul_sub_one_of_isAddFreimanIso_of_finrank_span_sub_eq hX hXX hf hdim
 
+/-- **Freiman's lemma for a Freiman model.** If `X` is a nonempty finite subset of a cancellative
+commutative monoid with `|X + X| ≤ κ * |X|` for a real `κ`, and `f` is a Freiman isomorphism of
+order `2` from `X` onto a subset of `ℝ^r` of affine dimension `r`, then
+`r ≤ κ - 1 + κ * (2 * κ - 1) / |X|`. -/
+theorem le_sub_one_add_mul_div_card_of_isAddFreimanIso_of_finrank_span_sub_eq' {G : Type*}
+    [DecidableEq G] [AddCancelCommMonoid G] {r : ℕ} {κ : ℝ} {X : Finset G} {f : G → Fin r → ℝ}
+    (hX : X.Nonempty) (hXX : (#(X + X) : ℝ) ≤ κ * #X)
+    (hf : IsAddFreimanIso 2 (X : Set G) (X.image f : Set (Fin r → ℝ)) f)
+    (hdim : Module.finrank ℝ (Submodule.span ℝ (↑(X.image f) - ↑(X.image f) : Set (Fin r → ℝ))) =
+      r) :
+    r ≤ κ - 1 + κ * (2 * κ - 1) / #X :=
+  le_sub_one_add_mul_div_card_of_isAddFreimanIso_of_finrank_span_sub_eq hX hXX hf hdim
+
 end SumOfSetsInSeveralDimensions

@@ -9,8 +9,8 @@ project:
     |A + B| ≥ |A| + Σ_{t=1}^{|B|-1} min(d, |A| - t). For d ≥ 1 and |A| ≥ d + 1
     the bound is attained in ℝ^d. The closed form
     |A + B| ≥ |A| + d|B| - d(d+1)/2, the asymmetric form of Freiman's lemma, is derived from
-    the bound, and so is the bound 2κ - 1, for a real κ, on the Freiman dimension of a set X
-    with |X + X| ≤ κ|X|.
+    the bound, and so are the bounds 2κ - 1 and κ - 1 + κ(2κ - 1)/|X|, for a real κ, on the
+    Freiman dimension of a set X with |X + X| ≤ κ|X|.
   authors:
     - "Gabriel Dahia"
   license: "Apache-2.0"
@@ -53,9 +53,9 @@ status:
     translation, and bounds for the dimension of a sumset by those of the summands and of the
     union. The library also defines the Freiman dimension of a finite subset of a
     commutative monoid, deduces Theorem 1 for sets with a Freiman model in ℝ^r and for sets of
-    given Freiman dimension, and bounds r, and the Freiman dimension of X, by 2κ - 1 when
-    |X + X| ≤ κ|X|. The sorry counts refer to the library and Solution.lean; Challenge.lean has
-    one placeholder for each of its six statements.
+    given Freiman dimension, and bounds r, and the Freiman dimension of X, by 2κ - 1 and by
+    κ - 1 + κ(2κ - 1)/|X| when |X + X| ≤ κ|X|. The sorry counts refer to the library and
+    Solution.lean; Challenge.lean has one placeholder for each of its seven statements.
   sorry_count: 0
   sorry_in_definitions: 0
   axioms: ["propext", "Classical.choice", "Quot.sound"]
@@ -76,7 +76,8 @@ automation:
         the statements and proofs after Gabriel Dahia's review of other repositories, to
         bring back the Freiman dimension, to formalize the remaining results of the paper
         from a copy of it, and to state the Freiman dimension results in Challenge.lean with
-        a real κ.
+        a real κ. Later, one instruction to prove that the Freiman dimension is at most κ - 1
+        plus an explicit term that tends to 0.
     - method: "agent"
       models: ["gpt-5.6 sol high", "claude opus 5"]
       framework: "Codex"
@@ -88,7 +89,9 @@ automation:
     The first proof of Theorem 1 and the Freiman dimension were written by Codex agents.
     Claude Code, directed by Gabriel Dahia, assembled this repository, rewrote those
     proofs, and wrote the remaining statements and proofs, Challenge.lean, Solution.lean
-    and this file. The solution theorems use only propext, Classical.choice and Quot.sound.
+    and this file. Later, the agent derived the bound κ - 1 + κ(2κ - 1)/|X| from Corollary 1.1
+    and the bound 2κ - 1. The solution theorems use only propext, Classical.choice and
+    Quot.sound. Every proof is checked by Lean.
 
 fidelity:
   divergences: >-
@@ -198,6 +201,18 @@ alignment:
       note: "With r = freimanDim (A ∪ B) ≥ 1."
     - source: "Not in the paper: the Freiman dimension is at most 2κ - 1"
       lean: "SumOfSetsInSeveralDimensions.freimanDim_le_two_mul_sub_one_of_card_add_le"
+      module: "SumOfSetsInSeveralDimensions.FreimanDimensionSumsetBounds"
+      status: "proved"
+      note: "For a nonempty X in a cancellative commutative monoid and a real κ."
+    - source: "Not in the paper: the bound κ - 1 + κ(2κ - 1)/|X| for Freiman models"
+      lean: "SumOfSetsInSeveralDimensions.le_sub_one_add_mul_div_card_of_isAddFreimanIso_of_finrank_span_sub_eq'"
+      module: "Challenge"
+      status: "proved"
+      note: >-
+        For a nonempty X in a cancellative commutative monoid with |X + X| ≤ κ|X|, κ real, and
+        a Freiman model of X in ℝ^r.
+    - source: "Not in the paper: the Freiman dimension is at most κ - 1 + κ(2κ - 1)/|X|"
+      lean: "SumOfSetsInSeveralDimensions.freimanDim_le_sub_one_add_mul_div_card_of_card_add_le"
       module: "SumOfSetsInSeveralDimensions.FreimanDimensionSumsetBounds"
       status: "proved"
       note: "For a nonempty X in a cancellative commutative monoid and a real κ."

@@ -22,10 +22,11 @@ Theorems 1 and 2 and Corollary 1.1 of Ruzsa, *Sum of sets in several dimensions*
 such a sumset, and its closed form, the asymmetric form of Freiman's lemma. The affine dimension of
 a finite set `S ⊆ ℝ^D` is the dimension of the span of `S - S`.
 
-Two consequences that are not in the paper are stated for Freiman models: finite subsets of a
+Three consequences that are not in the paper are stated for Freiman models: finite subsets of a
 commutative monoid with a Freiman isomorphism of order `2` onto a set in `ℝ^r` of affine dimension
-`r`. The first is Ruzsa's theorem for such sets, with `r - 1` in place of `d`. The second bounds
-`r` by `2 * κ - 1` for a set `X` with `|X + X| ≤ κ * |X|`.
+`r`. The first is Ruzsa's theorem for such sets, with `r - 1` in place of `d`. The second and the
+third bound `r` by `2 * κ - 1` and by `κ - 1 + κ * (2 * κ - 1) / |X|` for a set `X` with
+`|X + X| ≤ κ * |X|`.
 
 The proofs are in `Solution.lean`.
 -/
@@ -97,6 +98,19 @@ theorem le_two_mul_sub_one_of_isAddFreimanIso_of_finrank_span_sub_eq' {G : Type*
     (hdim : Module.finrank ℝ (Submodule.span ℝ (↑(X.image f) - ↑(X.image f) : Set (Fin r → ℝ))) =
       r) :
     (r : ℝ) ≤ 2 * κ - 1 :=
+  sorry
+
+/-- **Freiman's lemma for a Freiman model.** If `X` is a nonempty finite subset of a cancellative
+commutative monoid with `|X + X| ≤ κ * |X|` for a real `κ`, and `f` is a Freiman isomorphism of
+order `2` from `X` onto a subset of `ℝ^r` of affine dimension `r`, then
+`r ≤ κ - 1 + κ * (2 * κ - 1) / |X|`. -/
+theorem le_sub_one_add_mul_div_card_of_isAddFreimanIso_of_finrank_span_sub_eq' {G : Type*}
+    [DecidableEq G] [AddCancelCommMonoid G] {r : ℕ} {κ : ℝ} {X : Finset G} {f : G → Fin r → ℝ}
+    (hX : X.Nonempty) (hXX : (#(X + X) : ℝ) ≤ κ * #X)
+    (hf : IsAddFreimanIso 2 (X : Set G) (X.image f : Set (Fin r → ℝ)) f)
+    (hdim : Module.finrank ℝ (Submodule.span ℝ (↑(X.image f) - ↑(X.image f) : Set (Fin r → ℝ))) =
+      r) :
+    r ≤ κ - 1 + κ * (2 * κ - 1) / #X :=
   sorry
 
 end SumOfSetsInSeveralDimensions
