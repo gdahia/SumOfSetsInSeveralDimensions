@@ -25,6 +25,7 @@ affine subspace. The affine dimension of the image is the `Finset.affineDim` of 
 ## Main statements
 
 * `le_freimanDim_of_model`: if `d ≤ |X|` and `freimanModelDim X d`, then `d ≤ freimanDim X`.
+* `freimanDim_add_one_le_card`: a nonempty set `X` has Freiman dimension at most `|X| - 1`.
 -/
 
 @[expose] public section
@@ -53,5 +54,16 @@ lemma le_freimanDim_of_model {G : Type*} [DecidableEq G] [AddCommMonoid G] {X : 
     (hd : d ≤ #X) (hmodel : freimanModelDim X d) : d ≤ freimanDim X := by
   classical
   exact Nat.le_findGreatest hd hmodel
+
+/-- A nonempty set `X` has Freiman dimension at most `|X| - 1`. -/
+lemma freimanDim_add_one_le_card {G : Type*} [DecidableEq G] [AddCommMonoid G] {X : Finset G}
+    (hX : X.Nonempty) : freimanDim X + 1 ≤ #X := by
+  classical
+  by_cases h : freimanDim X = 0
+  · grind [hX.card_pos]
+  obtain ⟨f, -, hdim⟩ : freimanModelDim X (freimanDim X) := Nat.findGreatest_of_ne_zero rfl h
+  grind [affineDim_add_one_le_card ((hX.image f).image rationalVectorToReal),
+    card_image_le (s := X) (f := f),
+    card_image_le (s := X.image f) (f := rationalVectorToReal)]
 
 end SumOfSetsInSeveralDimensions

@@ -35,8 +35,12 @@ Freiman's lemma gives `(r + 1) * |X| - r * (r + 1) / 2 ≤ |X + X|`. If `|X + X|
 
 * `card_add_sum_min_le_card_add_of_isAddFreimanIso`: the bound above.
 * `card_add_sum_min_le_of_freimanDim_union`: the bound for `r` the Freiman dimension of `A ∪ B`.
+* `two_mul_card_add_mul_card_le_of_isAddFreimanIso`: Freiman's lemma for a Freiman model `f` of
+  `X` in `ℝ^r` of affine dimension `r`, `2 * (|X| + r * |X|) ≤ 2 * |X + X| + r * (r + 1)`.
 * `card_add_mul_card_sub_choose_le_card_add_of_freimanDim_union`: the weaker bound
   `|A| + (r - 1) * |B| - (r + 1).choose 2 ≤ |A + B|`.
+* `card_add_mul_card_sub_le_card_add_of_freimanDim`: if `X` is nonempty with Freiman dimension
+  `r ≥ 1`, then `|X| + r * |X| - r * (r + 1) / 2 ≤ |X + X|`.
 * `le_two_mul_sub_one_of_isAddFreimanIso`: if `|X + X| ≤ κ * |X|` for a real `κ`, then a Freiman
   model of `X` in `ℝ^r` of affine dimension `r` has `r ≤ 2 * κ - 1`.
 * `freimanDim_le_two_mul_sub_one_of_card_add_le`: if `|X + X| ≤ κ * |X|`, then
@@ -79,6 +83,15 @@ lemma isAddFreimanIso_rationalVectorToReal_comp {G : Type*} [AddCommMonoid G] {d
   · intro a ha b hb c hc e he
     simp only [Function.comp, ← rationalVectorToReal_add, rationalVectorToReal_injective.eq_iff]
     exact hf.2 a ha b hb c hc e he
+
+/-- A set of Freiman dimension `r ≥ 1` has a Freiman model in `ℝ^r` of affine dimension `r`. -/
+lemma exists_isAddFreimanIso_of_freimanDim_eq {G : Type*} [DecidableEq G] [AddCommMonoid G]
+    {r : ℕ} {X : Finset G} (hdim : freimanDim X = r) (hr : r ≠ 0) :
+    ∃ f : G → Fin r → ℝ, IsAddFreimanIso 2 (X : Set G) (X.image f : Set (Fin r → ℝ)) f ∧
+      (X.image f).affineDim = r := by
+  classical
+  obtain ⟨f, hf, haff⟩ := Nat.findGreatest_of_ne_zero hdim hr
+  exact ⟨_, isAddFreimanIso_rationalVectorToReal_comp hf, by rwa [← image_image]⟩
 
 /-- Two maps with the same fibres on `s` have images of `s` of the same size. -/
 lemma card_image_eq_of_kernel_iff {α β γ : Type*} [DecidableEq β] [DecidableEq γ]
@@ -140,6 +153,19 @@ theorem card_add_sum_min_le_card_add_of_isAddFreimanIso_of_finrank_span_sub_eq {
   card_add_sum_min_le_card_add_of_isAddFreimanIso hB hBA hf
     ((affineDim_eq_finrank_span_sub _).trans hdim)
 
+/-- **Freiman's lemma for a Freiman model.** If `f` is a Freiman isomorphism of order `2` from a
+nonempty `X` onto a subset of `ℝ^r` of affine dimension `r`, then
+`2 * (|X| + r * |X|) ≤ 2 * |X + X| + r * (r + 1)`. -/
+lemma two_mul_card_add_mul_card_le_of_isAddFreimanIso {G : Type*} [DecidableEq G]
+    [AddCommMonoid G] {r : ℕ} {X : Finset G} {f : G → Fin r → ℝ} (hX : X.Nonempty)
+    (hf : IsAddFreimanIso 2 (X : Set G) (X.image f : Set (Fin r → ℝ)) f)
+    (hdim : (X.image f).affineDim = r) :
+    2 * (#X + r * #X) ≤ 2 * #(X + X) + r * (r + 1) := by
+  have h := two_mul_card_add_mul_card_le (hX.image f) le_rfl
+    (hdim.symm.trans_le (affineDim_le_affineDim_add_right _ (hX.image f)))
+  rwa [card_image_of_injOn hf.bijOn.injOn,
+    card_add_image_of_isAddFreimanIso hf subset_rfl subset_rfl] at h
+
 private lemma sub_one_mul_le_choose_add_choose (b r : ℕ) :
     (r - 1) * b ≤ b.choose 2 + (r + 1).choose 2 := by
   obtain _ | r := r
@@ -165,14 +191,6 @@ private lemma sum_Icc_min_sub {b r : ℕ} (hr : 1 ≤ r) (hrb : r ≤ b) :
     ← Ico_add_one_right_eq_Icc, Nat.sub_add_cancel (hr.trans hrb)]
   convert sum_Ico_reflect (fun s ↦ min (r - 1) s) 1 (Nat.le_succ b) using 3 <;> grind
 
-private lemma add_one_le_two_mul_of_add_choose_add_le {b r : ℕ} {κ : ℝ} (hr : 1 ≤ r)
-    (hrb : r ≤ b) (hbound : ((b + (r.choose 2 + (b - r) * (r - 1)) : ℕ) : ℝ) ≤ κ * b) :
-    (r : ℝ) + 1 ≤ 2 * κ := by
-  rw [Nat.cast_add, Nat.cast_add, Nat.cast_mul, Nat.cast_choose_two, Nat.cast_sub hrb,
-    Nat.cast_pred hr] at hbound
-  nlinarith [mul_nonneg (sub_nonneg.2 (mod_cast hrb : (r : ℝ) ≤ b))
-    (sub_nonneg.2 (mod_cast hr : (1 : ℝ) ≤ r)), (mod_cast hr.trans hrb : (1 : ℝ) ≤ b)]
-
 /-- In a cancellative monoid, `|X + X| ≤ κ * |X|` for a nonempty `X` forces `1 ≤ κ`. -/
 private lemma one_le_of_card_add_le {G : Type*} [DecidableEq G] [AddCancelCommMonoid G] {κ : ℝ}
     {X : Finset G} (hX : X.Nonempty) (hXX : (#(X + X) : ℝ) ≤ κ * #X) : 1 ≤ κ := by
@@ -186,14 +204,13 @@ theorem le_two_mul_sub_one_of_isAddFreimanIso {G : Type*} [DecidableEq G]
     (hX : X.Nonempty) (hXX : (#(X + X) : ℝ) ≤ κ * #X)
     (hf : IsAddFreimanIso 2 (X : Set G) (X.image f : Set (Fin r → ℝ)) f)
     (hdim : (X.image f).affineDim = r) : (r : ℝ) ≤ 2 * κ - 1 := by
-  obtain rfl | hr := r.eq_zero_or_pos
-  · grind [one_le_of_card_add_le hX hXX]
-  have hrX : r ≤ #X := by
+  have hrX : r + 1 ≤ #X := by
     grind [affineDim_add_one_le_card (hX.image f), card_image_of_injOn hf.bijOn.injOn]
-  have h := card_add_sum_min_le_card_add_of_isAddFreimanIso hX le_rfl (by rwa [union_self])
-    (by rwa [union_self])
-  rw [sum_Icc_min_sub hr hrX] at h
-  linarith [add_one_le_two_mul_of_add_choose_add_le hr hrX ((Nat.cast_le.2 h).trans hXX)]
+  have h : (2 * (#X + r * #X) : ℝ) ≤ 2 * #(X + X) + r * (r + 1) :=
+    mod_cast two_mul_card_add_mul_card_le_of_isAddFreimanIso hX hf hdim
+  nlinarith [mul_nonneg (by positivity : (0 : ℝ) ≤ r + 1)
+    (sub_nonneg.2 (mod_cast hrX.trans' r.le_succ : (r : ℝ) ≤ #X)),
+    (mod_cast hX.card_pos : (0 : ℝ) < #X)]
 
 /-- The bound `r ≤ 2 * κ - 1` for a Freiman model, with the affine dimension of the model written
 as the dimension of the span of its differences. -/
@@ -235,10 +252,8 @@ theorem card_add_sum_min_le_of_freimanDim_union {G : Type*} [DecidableEq G] [Add
     {r : ℕ} {A B : Finset G} (hr : 1 ≤ r) (hB : B.Nonempty) (hBA : #B ≤ #A)
     (hdim : freimanDim (A ∪ B) = r) :
     #A + ∑ t ∈ Icc 1 (#B - 1), min (r - 1) (#A - t) ≤ #(A + B) := by
-  classical
-  obtain ⟨f, hf, haff⟩ := Nat.findGreatest_of_ne_zero hdim (Nat.ne_of_gt hr)
-  exact card_add_sum_min_le_card_add_of_isAddFreimanIso hB hBA
-    (isAddFreimanIso_rationalVectorToReal_comp hf) (by rwa [← image_image])
+  obtain ⟨f, hf, haff⟩ := exists_isAddFreimanIso_of_freimanDim_eq hdim (Nat.ne_of_gt hr)
+  exact card_add_sum_min_le_card_add_of_isAddFreimanIso hB hBA hf haff
 
 /-- Let `A` and `B` be finite with `B` nonempty and `|B| ≤ |A|`, and let `r ≥ 1` be the Freiman
 dimension of `A ∪ B`. Then `|A| + (r - 1) * |B| - (r + 1).choose 2 ≤ |A + B|`. -/
@@ -249,18 +264,24 @@ lemma card_add_mul_card_sub_choose_le_card_add_of_freimanDim_union
   grind [card_add_sum_min_le_of_freimanDim_union hr hB hBA hdim,
     sub_mul_sub_choose_le_sum_min_of_le (r := r) (d := r - 1) hBA (by grind)]
 
+/-- Freiman's lemma for `X + X` in terms of the Freiman dimension: if `X` is nonempty with Freiman
+dimension `r ≥ 1`, then `(r + 1) * |X| - r * (r + 1) / 2 ≤ |X + X|`. -/
+lemma card_add_mul_card_sub_le_card_add_of_freimanDim {G : Type*} [DecidableEq G]
+    [AddCommMonoid G] {X : Finset G} (hX : X.Nonempty) (hr : freimanDim X ≠ 0) :
+    (freimanDim X + 1) * #X - freimanDim X * (freimanDim X + 1) / 2 ≤ #(X + X) := by
+  obtain ⟨f, hf, hdim⟩ := exists_isAddFreimanIso_of_freimanDim_eq rfl hr
+  grind [two_mul_card_add_mul_card_le_of_isAddFreimanIso hX hf hdim]
+
 /-- If `|X + X| ≤ κ * |X|` for a nonempty `X`, then `X` has Freiman dimension at most
 `2 * κ - 1`. -/
 theorem freimanDim_le_two_mul_sub_one_of_card_add_le {G : Type*} [DecidableEq G]
     [AddCancelCommMonoid G] {κ : ℝ} {X : Finset G} (hX : X.Nonempty)
     (hXX : (#(X + X) : ℝ) ≤ κ * #X) : (freimanDim X : ℝ) ≤ 2 * κ - 1 := by
-  classical
   obtain hr | hr := (freimanDim X).eq_zero_or_pos
   · rw [hr, Nat.cast_zero]
     linarith [one_le_of_card_add_le hX hXX]
-  obtain ⟨f, hf, haff⟩ := Nat.findGreatest_of_ne_zero (rfl : freimanDim X = _) hr.ne'
-  exact le_two_mul_sub_one_of_isAddFreimanIso hX hXX (isAddFreimanIso_rationalVectorToReal_comp hf)
-    (by rwa [← image_image])
+  obtain ⟨f, hf, haff⟩ := exists_isAddFreimanIso_of_freimanDim_eq rfl hr.ne'
+  exact le_two_mul_sub_one_of_isAddFreimanIso hX hXX hf haff
 
 /-- If `|X + X| ≤ κ * |X|` for a nonempty `X` and `f` is a Freiman isomorphism of order `2` from
 `X` onto a subset of `ℝ^r` of affine dimension `r`, then `r ≤ κ - 1 + κ * (2 * κ - 1) / |X|`. -/
@@ -269,10 +290,8 @@ theorem le_sub_one_add_mul_div_card_of_isAddFreimanIso {G : Type*} [DecidableEq 
     (hX : X.Nonempty) (hXX : (#(X + X) : ℝ) ≤ κ * #X)
     (hf : IsAddFreimanIso 2 (X : Set G) (X.image f : Set (Fin r → ℝ)) f)
     (hdim : (X.image f).affineDim = r) : r ≤ κ - 1 + κ * (2 * κ - 1) / #X := by
-  have h := card_add_mul_card_sub_le_card_add (hX.image f) le_rfl
-    (hdim.symm.trans_le (affineDim_le_affineDim_add_right _ (hX.image f)))
-  rw [card_image_of_injOn hf.bijOn.injOn,
-    card_add_image_of_isAddFreimanIso hf subset_rfl subset_rfl] at h
+  have h : (2 * (#X + r * #X) : ℝ) ≤ 2 * #(X + X) + r * (r + 1) :=
+    mod_cast two_mul_card_add_mul_card_le_of_isAddFreimanIso hX hf hdim
   have hr := le_two_mul_sub_one_of_isAddFreimanIso hX hXX hf hdim
   rw [← sub_le_iff_le_add', le_div_iff₀ (mod_cast hX.card_pos)]
   nlinarith [mul_nonneg (sub_nonneg.2 hr) (by linarith : (0 : ℝ) ≤ 2 * κ + r)]
@@ -294,15 +313,13 @@ theorem le_sub_one_add_mul_div_card_of_isAddFreimanIso_of_finrank_span_sub_eq {G
 theorem freimanDim_le_sub_one_add_mul_div_card_of_card_add_le {G : Type*} [DecidableEq G]
     [AddCancelCommMonoid G] {κ : ℝ} {X : Finset G} (hX : X.Nonempty)
     (hXX : (#(X + X) : ℝ) ≤ κ * #X) : freimanDim X ≤ κ - 1 + κ * (2 * κ - 1) / #X := by
-  classical
   obtain hr | hr := (freimanDim X).eq_zero_or_pos
   · rw [hr, Nat.cast_zero]
     have hκ := one_le_of_card_add_le hX hXX
     have : 0 ≤ κ * (2 * κ - 1) / #X := div_nonneg (by nlinarith) (Nat.cast_nonneg _)
     linarith
-  obtain ⟨f, hf, haff⟩ := Nat.findGreatest_of_ne_zero (rfl : freimanDim X = _) hr.ne'
-  exact le_sub_one_add_mul_div_card_of_isAddFreimanIso hX hXX
-    (isAddFreimanIso_rationalVectorToReal_comp hf) (by rwa [← image_image])
+  obtain ⟨f, hf, haff⟩ := exists_isAddFreimanIso_of_freimanDim_eq rfl hr.ne'
+  exact le_sub_one_add_mul_div_card_of_isAddFreimanIso hX hXX hf haff
 
 end
 
