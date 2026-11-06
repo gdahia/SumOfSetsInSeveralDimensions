@@ -10,24 +10,28 @@ of such a sumset, and its closed form, the asymmetric form of Freiman's lemma.
 The affine dimension of a finite set $S \subseteq \mathbb{R}^D$ is the dimension of the direction
 of its affine span, that is, of the subspace spanned by the differences of the points of $S$.
 
-**Theorem 1**
-(`SumOfSetsInSeveralDimensions.card_add_sum_min_le_card_add_of_finrank_span_sub_eq`). Let
-$A, B \subseteq \mathbb{R}^D$ be finite sets with $B$ nonempty and $|B| \le |A|$. If $d$ is
-the affine dimension of $A + B$, then
+**Theorem 1** (`SumOfSetsInSeveralDimensions.card_add_sum_min_le_card_add_of_finrank_span_sub_eq`).
+Let $A, B \subseteq \mathbb{R}^D$ be finite sets with $B$ nonempty and
+$\left\lvert B\right\rvert \le \left\lvert A\right\rvert$. If $d$ is the affine dimension of
+$A + B$, then
 
-$$|A + B| \ge |A| + \sum_{t=1}^{|B|-1} \min(d, |A| - t).$$
+$$\left\lvert A + B\right\rvert \ge \left\lvert A\right\rvert +
+\sum_{t=1}^{\left\lvert B\right\rvert-1} \min(d, \left\lvert A\right\rvert - t).$$
 
 **Corollary 1.1**
 (`SumOfSetsInSeveralDimensions.card_add_mul_card_le_card_add_add_of_le_finrank_span_sub`). Let
-$A, B \subseteq \mathbb{R}^D$ be finite sets with $B$ nonempty and $|B| \le |A|$. If $d$ is
-at most the affine dimension of $A + B$, then
+$A, B \subseteq \mathbb{R}^D$ be finite sets with $B$ nonempty and
+$\left\lvert B\right\rvert \le \left\lvert A\right\rvert$. If $d$ is at most the affine dimension of
+$A + B$, then
 
-$$|A| + d|B| \le |A + B| + \frac{d(d+1)}{2}.$$
+$$\left\lvert A\right\rvert + d\left\lvert B\right\rvert \le
+\left\lvert A + B\right\rvert + \frac{d(d+1)}{2}.$$
 
 **Theorem 2** (`SumOfSetsInSeveralDimensions.sInf_card_add_eq_add_sum_min` and
 `SumOfSetsInSeveralDimensions.sInf_card_add_of_finrank_span_sub_right_eq_add_sum_min`). Let
 $d \ge 1$, $1 \le m \le n$ and $n \ge d + 1$. The least size of $A + B$ over sets
-$A, B \subseteq \mathbb{R}^d$ with $|A| = m$, $|B| = n$ and $A + B$ of affine dimension $d$ is
+$A, B \subseteq \mathbb{R}^d$ with $\left\lvert A\right\rvert = m$, $\left\lvert B\right\rvert = n$
+and $A + B$ of affine dimension $d$ is
 
 $$G_d(m, n) = n + \sum_{j=1}^{m-1} \min(d, n - j),$$
 
@@ -39,25 +43,28 @@ affine dimension $r$.
 
 **Theorem 1 for Freiman models**
 (`SumOfSetsInSeveralDimensions.card_add_sum_min_le_card_add_of_isAddFreimanIso_of_finrank_span_sub_eq`).
-Let $A, B$ be finite subsets of a commutative monoid with $B$ nonempty and $|B| \le |A|$. If
-$A \cup B$ has a Freiman model in $\mathbb{R}^r$, then
+Let $A, B$ be finite subsets of a commutative monoid with $B$ nonempty and
+$\left\lvert B\right\rvert \le \left\lvert A\right\rvert$. If $A \cup B$ has a Freiman model in
+$\mathbb{R}^r$, then
 
-$$|A + B| \ge |A| + \sum_{t=1}^{|B|-1} \min(r - 1, |A| - t).$$
+$$\left\lvert A + B\right\rvert \ge \left\lvert A\right\rvert +
+\sum_{t=1}^{\left\lvert B\right\rvert-1} \min(r - 1, \left\lvert A\right\rvert - t).$$
 
 **The Freiman dimension and the doubling**
-(`SumOfSetsInSeveralDimensions.le_two_mul_sub_one_of_isAddFreimanIso_of_finrank_span_sub_eq`).
-Let $X$ be a nonempty finite subset of a cancellative commutative monoid with
-$|X + X| \le \kappa |X|$ for a real $\kappa$. If $X$ has a Freiman model in $\mathbb{R}^r$, then
-$r \le 2\kappa - 1$.
+(`SumOfSetsInSeveralDimensions.le_two_mul_sub_one_of_isAddFreimanIso_of_finrank_span_sub_eq`). Let
+$X$ be a nonempty finite subset of a cancellative commutative monoid with
+$\left\lvert X + X\right\rvert \le \kappa \left\lvert X\right\rvert$ for a real $\kappa$. If $X$ has
+a Freiman model in $\mathbb{R}^r$, then $r \le 2\kappa - 1$.
 
 **Freiman's lemma for Freiman models**
 (`SumOfSetsInSeveralDimensions.le_sub_one_add_mul_div_card_of_isAddFreimanIso_of_finrank_span_sub_eq`).
 Under the same hypotheses,
 
-$$r \le \kappa - 1 + \frac{\kappa(2\kappa - 1)}{|X|}.$$
+$$r \le \kappa - 1 + \frac{\kappa(2\kappa - 1)}{\left\lvert X\right\rvert}.$$
 
-The error term tends to $0$ as $|X| \to \infty$ with $\kappa$ fixed. The proof applies Corollary 1.1
-to the model of $X$ with $d = r$, which gives $(r + 1)|X| - r(r + 1)/2 \le \kappa |X|$, and bounds
+The error term tends to $0$ as $\left\lvert X\right\rvert \to \infty$ with $\kappa$ fixed. The proof
+applies Corollary 1.1 to the model of $X$ with $d = r$, which gives
+$(r + 1)\left\lvert X\right\rvert - r(r + 1)/2 \le \kappa \left\lvert X\right\rvert$, and bounds
 $r(r + 1)/2$ by $\kappa(2\kappa - 1)$ with $r \le 2\kappa - 1$.
 
 The library states these seven theorems with the affine dimension of a set $S$ written as
